@@ -101,4 +101,7 @@ $(document).ready(function () {
     // light bulbs related
     // var $winHeight = $( window ).height()
     // $( '.container' ).height( $winHeight );
+    setLightOff(LIGHT_NEITHER_CLASS, CONFIDENCE_NEITHER_ID);
+    setLightOff(LIGHT_HATE_CLASS, CONFIDENCE_HATE_ID);
+    setLightOff(LIGHT_OFFENSIVE_CLASS, CONFIDENCE_OFFENSIVE_ID);
 });

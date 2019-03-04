@@ -10,7 +10,7 @@ stopword = nltk.corpus.stopwords.words('english')
 
 def remove_punct(text):
     text  = "".join([char for char in text if char not in string.punctuation])
-    text = re.sub('[0-9]+', '', text)
+    text = re.sub('[0-9]+', '', text)  # TODO double check if it is necessary to remove number
     return text
 
 def tokenization(text):

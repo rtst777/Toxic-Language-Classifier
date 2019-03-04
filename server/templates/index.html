@@ -22,26 +22,30 @@
         <span class="input-group-addon btn btn-primary" onclick="submitClassificationRequest()">Classify</span>
     </div>
     <div id="count_message"></div>
-    <div class="light_container">
-        <div class="led-box">
-            <div class="led-hate"></div>
-            <br>
-            <p>Hate Speech</p>
-            <p class="led-confidence-value" id="hate-value"><p>
-        </div>
-        <div class="led-box">
-            <div class="led-offensive"></div>
-            <br>
-            <p>Offensive Language</p>
-            <p class="led-confidence-value" id="offensive-value"><p>
-        </div>
-        <div class="led-box">
-            <div class="led-neither"></div>
-            <br>
-            <p>Neither</p>
-            <p class="led-confidence-value" id="neither-value"><p>
-        </div>
-    </div>
 </form>
+
+<div class="light_container">
+    <div class="led-box">
+        <div class="led-hate"></div>
+        <br>
+        <p>Hate Speech</p>
+        <p class="led-confidence-value" id="hate-value">
+        <p>
+    </div>
+    <div class="led-box">
+        <div class="led-offensive"></div>
+        <br>
+        <p>Offensive Language</p>
+        <p class="led-confidence-value" id="offensive-value">
+        <p>
+    </div>
+    <div class="led-box">
+        <div class="led-neither"></div>
+        <br>
+        <p>Neither</p>
+        <p class="led-confidence-value" id="neither-value">
+        <p>
+    </div>
+</div>
 
 {% endblock %}
