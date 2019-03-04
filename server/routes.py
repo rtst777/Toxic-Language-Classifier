@@ -2,8 +2,6 @@ from server.service.classification_service import predict
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
-
-# https://github.com/macloo/basic-flask-app
 @app.route('/')
 @app.route('/index.html')
 def index():
