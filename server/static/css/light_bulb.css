@@ -1,0 +1,46 @@
+.light_container {
+  padding-top: 20px;
+  padding-bottom: 90px;
+}
+
+.led-box {
+  height: 30px;
+  width: 30%;
+  /*margin: 10px 0;*/
+  float: left;
+  font-weight:bold;
+}
+
+.led-box p {
+  font-size: 15px;
+  text-align: center;
+  /*margin: 1em;*/
+  margin: unset;
+}
+
+.led-hate {
+  margin: 0 auto;
+  width: 36px;
+  height: 36px;
+  background-color: #DCDCDC;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #A9A9A9 0 -1px 9px, #D3D3D3 0 2px 12px;
+}
+
+.led-offensive {
+  margin: 0 auto;
+  width: 36px;
+  height: 36px;
+  background-color: #DCDCDC;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #A9A9A9 0 -1px 9px, #D3D3D3 0 2px 12px;
+}
+
+.led-neither {
+  margin: 0 auto;
+  width: 36px;
+  height: 36px;
+  background-color: #F00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+}
