@@ -36,13 +36,19 @@ function updateLight(label, confidence) {
             setLightOff(LIGHT_OFFENSIVE_CLASS, CONFIDENCE_OFFENSIVE_ID);
             break;
         case "hate":
+            setLightOff(LIGHT_NEITHER_CLASS, CONFIDENCE_NEITHER_ID);
             setLightOn(LIGHT_HATE_CLASS, CONFIDENCE_HATE_ID, confidence);
+            setLightOff(LIGHT_OFFENSIVE_CLASS, CONFIDENCE_OFFENSIVE_ID);
             break;
         case "offensive":
+            setLightOff(LIGHT_NEITHER_CLASS, CONFIDENCE_NEITHER_ID);
+            setLightOff(LIGHT_HATE_CLASS, CONFIDENCE_HATE_ID);
             setLightOn(LIGHT_OFFENSIVE_CLASS, CONFIDENCE_OFFENSIVE_ID, confidence);
             break;
         case "neither":
             setLightOn(LIGHT_NEITHER_CLASS, CONFIDENCE_NEITHER_ID, confidence);
+            setLightOff(LIGHT_HATE_CLASS, CONFIDENCE_HATE_ID);
+            setLightOff(LIGHT_OFFENSIVE_CLASS, CONFIDENCE_OFFENSIVE_ID);
             break;
         default:
             setLightOff(LIGHT_NEITHER_CLASS, CONFIDENCE_NEITHER_ID);
