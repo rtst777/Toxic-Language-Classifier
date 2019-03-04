@@ -7,11 +7,11 @@ const CONFIDENCE_HATE_ID = "#hate-value";
 const CONFIDENCE_OFFENSIVE_ID = "#offensive-value";
 
 function displayLoadingSpinner(){
-    // $('#loading').show()
+    $('#loading').show()
 }
 
 function hideLoadingSpinner(){
-    // $('#loading').hide()
+    $('#loading').hide()
 }
 
 function setLightOff(light_class, confidence_elem_id){
