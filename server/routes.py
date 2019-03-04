@@ -1,6 +1,7 @@
+from server.service.classification_service import predict
 from flask import Flask, render_template, request, jsonify
-import json
 app = Flask(__name__)
+
 
 # https://github.com/macloo/basic-flask-app
 @app.route('/')
@@ -11,9 +12,11 @@ def index():
 @app.route('/classify', methods=['POST'])
 def add_message():
     content = request.values.to_dict(flat=False)
-    print(content['input_text'])
-    print("HI")
-    return jsonify({"predicted_label": "offensive", "confidence": 0.7343})
+    text = content['input_text']
+    print(text)
+
+    prediction = predict(text)
+    return prediction # prediction should already be in json form
 
 if __name__ == '__main__':
     app.run(debug=True)
