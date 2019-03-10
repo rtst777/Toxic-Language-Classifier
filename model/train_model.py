@@ -1,9 +1,18 @@
 import pandas as pd
 import torchtext
 import torch
+import random
+import numpy as np
 
 github_data_clean_data = "../data/cleaned_data/dataset1.csv"
 INPUT_SIZE = 50
+
+
+def set_global_seed(seed=37):
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 glove = None
 def convert_word_to_glove(text):
@@ -13,6 +22,7 @@ def convert_word_to_glove(text):
 
     glove_text = [glove[x] for x in text]
     return glove_text
+
 
 def load_data_and_convert_to_glove():
     df = pd.read_csv(github_data_clean_data)
@@ -26,8 +36,31 @@ def load_data_and_convert_to_glove():
     return list(zip(converted_data, converted_label))
 
 
-def split_data():
-    pass
+# split data to train, valid, test set.
+def get_splitted_data(dataset, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
+    data_size = len(dataset)
+
+    # shuffle data set
+    random.shuffle(dataset)
+
+    # generate the index for randomly splitted training, validation, and test dataset
+    train_val_boundary = int(data_size * train_ratio)
+    val_test_boundary = int(data_size * (train_ratio + val_ratio))
+    end_boundary = data_size
+    train_data_set = dataset[0:train_val_boundary]
+    val_data_set = dataset[train_val_boundary:val_test_boundary]
+    test_data_set = dataset[val_test_boundary:end_boundary]
+
+    return train_data_set, val_data_set, test_data_set
+
+
+def get_data_loader(dataset):
+    data, label = zip(*dataset)
+    data = list(data)
+    label = list(label)
+
+
+    return torch.utils.data.TensorDataset(data, label)
 
 def get_accuracy(model, data, criterion, batch_size):
     data_iter = torchtext.data.BucketIterator(data,
@@ -100,6 +133,15 @@ def train_model(model, train, valid, batch_size = 32, learning_rate = 0.001, num
     print('Finished Training')
 
 if __name__== "__main__":
+    set_global_seed()
     data_set = load_data_and_convert_to_glove()
-    print(data_set[0])
-    split_data()
+    train_data_set, valid_data_set, test_data_set = get_splitted_data(data_set)
+    train_data_loader = get_data_loader(train_data_set)
+    valid_data_loader = get_data_loader(valid_data_set)
+    test_data_loader = get_data_loader(test_data_set)
+
+    print(len(train_data_loader))
+    print(len(valid_data_loader))
+    print(len(test_data_loader))
+
+
