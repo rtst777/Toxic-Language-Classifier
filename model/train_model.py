@@ -22,8 +22,7 @@ def load_data_and_convert_to_glove():
     label_numpy = subdf[['label']].values
     converted_label = [torch.from_numpy(label).squeeze(0) for label in label_numpy]
 
-    s = list(zip(converted_data, converted_label))
-    return s
+    return list(zip(converted_data, converted_label))
 
 
 def split_data():
