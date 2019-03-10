@@ -19,7 +19,7 @@ def convert_word_to_glove(text):
     if glove is None:
         glove = torchtext.vocab.GloVe(name="6B", dim=50)  # TODO tune number
 
-    glove_text = [glove[x] for x in text]
+    glove_text = [glove[x].tolist() for x in text]
     return glove_text
 
 
@@ -29,6 +29,7 @@ def load_data_and_convert_to_glove():
     subdf['data'] = subdf['data'].apply(lambda x: convert_word_to_glove(x))
 
     converted_data = subdf[['data']].values
+    converted_data = [arr.tolist() for arr in converted_data]
     label_numpy = subdf[['label']].values
     converted_label = [torch.from_numpy(label).squeeze(0) for label in label_numpy]
 
@@ -58,8 +59,10 @@ def get_data_loader(dataset):
     data = list(data)
     label = list(label)
 
+    data_tensor = torch.tensor(data)
+    label_tensor = torch.tensor(label)
 
-    return torch.utils.data.TensorDataset(data, label)
+    return torch.utils.data.TensorDataset(data_tensor, label_tensor)
 
 def get_accuracy(model, data, criterion, batch_size):
     data_iter = torchtext.data.BucketIterator(data,
