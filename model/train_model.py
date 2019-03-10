@@ -71,19 +71,15 @@ def convert_word_to_glove(text):
 
 
 
-def get_accuracy(model, data, criterion, batch_size):
-    data_iter = torchtext.data.BucketIterator(data,
-                                              batch_size=batch_size,
-                                              sort_key=lambda x: len(x.sms),
-                                              repeat=False)
+def get_accuracy(model, data_iter, criterion, batch_size):
     correct, total = 0, 0
     total_valid_loss = 0
     for i, batch in enumerate(data_iter):
-        output = model(batch.sms[0]) # Check this input data format
+        output = model(batch.dataset.data) # Check this input data format
         pred = output.max(1, keepdim=True)[1]
         correct += pred.eq(batch.label.view_as(pred)).sum().item()
         labels = batch.label
-        total += batch.sms[1].shape[0]
+        total += len(batch.label)
         loss = criterion(output, labels.long())
         total_valid_loss += loss.item()
     return correct / total, float(total_valid_loss) /(i+1)
@@ -102,12 +98,7 @@ def get_model_name(name, batch_size, learning_rate, epoch,momentum):
                                                    epoch,momentum)
     return path
 
-def train_model(model, train, valid, batch_size = 32, learning_rate = 0.001, num_epochs = 30, momentum = 0.9):
-    train_iterator = torchtext.data.BucketIterator(train,
-                                           batch_size=batch_size,
-                                           sort_key=lambda x: len(x.sms), # to minimize padding
-                                           sort_within_batch=True,        # sort within each batch
-                                           repeat=False)                   # repeat the iterator for multiple epochs
+def train_model(model, train_iterator, valid_iterator, batch_size = 32, learning_rate = 0.001, num_epochs = 30, momentum = 0.9):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
     train_err = np.zeros(num_epochs)
@@ -116,15 +107,15 @@ def train_model(model, train, valid, batch_size = 32, learning_rate = 0.001, num
     val_loss = np.zeros(num_epochs)
     for epoch in range(num_epochs):
         for i, batch in enumerate(train_iterator):
-            input_data = batch.sms[0]
+            input_data = batch.dataset.data
             optimizer.zero_grad()
             outputs = model(input_data)
             labels = batch.label
             loss = criterion(outputs, labels.long())
             loss.backward()
             optimizer.step()
-        train_err[epoch], train_loss[epoch] = get_accuracy(model, train, criterion, batch_size)
-        val_err[epoch], val_loss[epoch] = get_accuracy(model, valid, criterion, batch_size)
+        train_err[epoch], train_loss[epoch] = get_accuracy(model, train_iterator, criterion, batch_size)
+        val_err[epoch], val_loss[epoch] = get_accuracy(model, valid_iterator, criterion, batch_size)
         print(("Epoch {}: Train accuracy: {}, Train loss: {} |"+
                "Validation accuracy: {}, Validation loss: {}").format(
                    epoch + 1,
