@@ -197,6 +197,10 @@ if __name__== "__main__":
         for elem in train_data.data:
             if (len(elem) != 50):
                 print("shape not match")
-
-
-
+    train_iter = torchtext.data.Iterator.splits(train_set, batch_size=(300),sort_key=lambda x: len(x.data))
+    for i,batch in enumerate(train_iter):
+        if i >= 10:
+            break
+        max_size = len(batch.dataset.data)
+        length_list = len(batch.dataset.data)
+        print("Maximum Input Size: {}, Total Padding Size: {}".format(max_size, max_size - length_list))
