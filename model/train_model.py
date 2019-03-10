@@ -3,6 +3,10 @@ import torchtext
 import torch
 import random
 import numpy as np
+import ast
+import re
+import json
+import codecs
 
 github_data_clean_data = "../data/cleaned_data/dataset1.csv"
 
@@ -23,46 +27,48 @@ def convert_word_to_glove(text):
     return glove_text
 
 
-def load_data_and_convert_to_glove():
-    df = pd.read_csv(github_data_clean_data)
-    subdf = df[['data', 'label']]
-    subdf['data'] = subdf['data'].apply(lambda x: convert_word_to_glove(x))
+# def load_data_and_convert_to_glove():
+#     df = pd.read_csv(github_data_clean_data)
+#     subdf = df[['data', 'label']]
+#     subdf['data'] = subdf['data'].apply(lambda x: convert_word_to_glove(x))
+#
+#     converted_data = subdf[['data']].values
+#     converted_data = [arr.tolist() for arr in converted_data]
+#     label_numpy = subdf[['label']].values
+#     converted_label = [torch.from_numpy(label).squeeze(0) for label in label_numpy]
+#
+#     return list(zip(converted_data, converted_label))
+#
+#
+# # split data to train, valid, test set.
+# def get_splitted_data(dataset, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
+#     data_size = len(dataset)
+#
+#     # shuffle data set
+#     random.shuffle(dataset)
+#
+#     # generate the index for randomly splitted training, validation, and test dataset
+#     train_val_boundary = int(data_size * train_ratio)
+#     val_test_boundary = int(data_size * (train_ratio + val_ratio))
+#     end_boundary = data_size
+#     train_data_set = dataset[0:train_val_boundary]
+#     val_data_set = dataset[train_val_boundary:val_test_boundary]
+#     test_data_set = dataset[val_test_boundary:end_boundary]
+#
+#     return train_data_set, val_data_set, test_data_set
+#
+#
+# def get_data_loader(dataset):
+#     data, label = zip(*dataset)
+#     data = list(data)
+#     label = list(label)
+#
+#     data_tensor = torch.tensor(data)
+#     label_tensor = torch.tensor(label)
+#
+#     return torch.utils.data.TensorDataset(data_tensor, label_tensor)
 
-    converted_data = subdf[['data']].values
-    converted_data = [arr.tolist() for arr in converted_data]
-    label_numpy = subdf[['label']].values
-    converted_label = [torch.from_numpy(label).squeeze(0) for label in label_numpy]
 
-    return list(zip(converted_data, converted_label))
-
-
-# split data to train, valid, test set.
-def get_splitted_data(dataset, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
-    data_size = len(dataset)
-
-    # shuffle data set
-    random.shuffle(dataset)
-
-    # generate the index for randomly splitted training, validation, and test dataset
-    train_val_boundary = int(data_size * train_ratio)
-    val_test_boundary = int(data_size * (train_ratio + val_ratio))
-    end_boundary = data_size
-    train_data_set = dataset[0:train_val_boundary]
-    val_data_set = dataset[train_val_boundary:val_test_boundary]
-    test_data_set = dataset[val_test_boundary:end_boundary]
-
-    return train_data_set, val_data_set, test_data_set
-
-
-def get_data_loader(dataset):
-    data, label = zip(*dataset)
-    data = list(data)
-    label = list(label)
-
-    data_tensor = torch.tensor(data)
-    label_tensor = torch.tensor(label)
-
-    return torch.utils.data.TensorDataset(data_tensor, label_tensor)
 
 def get_accuracy(model, data, criterion, batch_size):
     data_iter = torchtext.data.BucketIterator(data,
@@ -134,16 +140,63 @@ def train_model(model, train, valid, batch_size = 32, learning_rate = 0.001, num
     np.savetxt("{}_val_loss.csv".format(model_path), val_loss)
     print('Finished Training')
 
+
+def tokenizer(word_str):
+    list_of_word = ast.literal_eval(codecs.encode(word_str).decode("utf-8"))
+    return convert_word_to_glove(list_of_word)
+
+
+def create_dataloader():
+    index_field = torchtext.data.Field(sequential=False,  # not a sequence
+                                       use_vocab=False,  # don't need to track vocabulary
+                                       is_target=True,
+                                       batch_first=True)  # convert text to 0 and
+    word_field = torchtext.data.Field(sequential=True,  # text sequence
+                                      tokenize=tokenizer,  # because are building a character-RNN
+                                      include_lengths=True,  # to track the length of sequences, for batc
+                                      batch_first=True,
+                                      use_vocab=False)  # to turn each character into an integer ind
+    label_field = torchtext.data.Field(sequential=False,  # not a sequence
+                                       use_vocab=False,  # don't need to track vocabulary
+                                       is_target=True,
+                                       batch_first=True,
+                                       preprocessing=lambda x: int(x))  # convert text to 0 and
+    fields = [('index', index_field), ('data', word_field), ('label', label_field)]
+
+    dataset = torchtext.data.TabularDataset(path=github_data_clean_data, skip_header=True, format='csv', fields=fields)
+    return dataset
+
+
+def split_data(dataset):
+    train_set, valid_set, test_set = dataset.split([0.6, 0.2, 0.2], random_state=random.getstate())
+    return train_set, valid_set, test_set
+
+
 if __name__== "__main__":
     set_global_seed()
-    data_set = load_data_and_convert_to_glove()
-    train_data_set, valid_data_set, test_data_set = get_splitted_data(data_set)
-    train_data_loader = get_data_loader(train_data_set)
-    valid_data_loader = get_data_loader(valid_data_set)
-    test_data_loader = get_data_loader(test_data_set)
+    # data_set = load_data_and_convert_to_glove()
+    # train_data_set, valid_data_set, test_data_set = get_splitted_data(data_set)
+    # train_data_loader = get_data_loader(train_data_set)
+    # valid_data_loader = get_data_loader(valid_data_set)
+    # test_data_loader = get_data_loader(test_data_set)
 
-    print(len(train_data_loader))
-    print(len(valid_data_loader))
-    print(len(test_data_loader))
+    # print(len(train_data_loader))
+    # print(len(valid_data_loader))
+    # print(len(test_data_loader))
+
+    dataset = create_dataloader()
+    train_set, valid_set, test_set = split_data(dataset)
+
+    train_iter = torchtext.data.BucketIterator(train_set,
+                                               batch_size=32,
+                                               sort_key=lambda x: len(x.data),  # to minimize padding
+                                               sort_within_batch=True,  # sort within each batch
+                                               repeat=False)  # repeat the iterator for
+
+    for train_data in train_set:
+        for elem in train_data.data:
+            if (len(elem) != 50):
+                print("shape not match")
+
 
 
