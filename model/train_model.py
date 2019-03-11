@@ -8,6 +8,7 @@ import re
 import json
 import codecs
 
+
 github_data_clean_data = "../data/cleaned_data/dataset1.csv"
 
 
@@ -178,20 +179,16 @@ if __name__== "__main__":
     dataset = create_dataloader()
     train_set, valid_set, test_set = split_data(dataset)
 
-    train_iter = torchtext.data.BucketIterator(train_set,
-                                               batch_size=32,
-                                               sort_key=lambda x: len(x.data),  # to minimize padding
-                                               sort_within_batch=True,  # sort within each batch
-                                               repeat=False)  # repeat the iterator for
+    #train_iter = torchtext.data.BucketIterator(train_set,
+    #                                           batch_size=32,
+    #                                           sort_key=lambda x: len(x.data),  # to minimize padding
+    #                                           sort_within_batch=True,  # sort within each batch
+    #                                           repeat=False)  # repeat the iterator for
 
     for train_data in train_set:
         for elem in train_data.data:
             if (len(elem) != 50):
                 print("shape not match")
-    train_iter = torchtext.data.Iterator.splits(train_set, batch_size=(300),sort_key=lambda x: len(x.data))
-    for i,batch in enumerate(train_iter):
-        if i >= 10:
-            break
-        max_size = len(batch.dataset.data)
-        length_list = len(batch.dataset.data)
-        print("Maximum Input Size: {}, Total Padding Size: {}".format(max_size, max_size - length_list))
+    train_iter = torchtext.data.Iterator.splits(train_set, batch_size=(32),sort_key=lambda x: len(x.data))
+    valid_iter = torchtext.data.Iterator.splits(valid_set, batch_size=(32),sort_key=lambda x: len(x.data))
+    train_model(model, train_iterator, valid_iterator, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
