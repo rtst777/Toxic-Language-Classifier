@@ -7,7 +7,9 @@ import ast
 import re
 import json
 import codecs
-
+import baseline_model
+import torch.nn as nn
+import torch.optim as optim
 
 github_data_clean_data = "../data/cleaned_data/dataset1.csv"
 INPUT_SIZE = 50
@@ -72,16 +74,22 @@ def convert_word_to_glove(text):
 
 
 
-def get_accuracy(model, data_iter, criterion, batch_size):
+def get_accuracy(model, data, criterion, batch_size):
+    data_iter = torchtext.data.BucketIterator.splits(data,
+                                              batch_size=batch_size,
+                                              sort_key=lambda x: len(x.data),  # to minimize padding
+                                              sort_within_batch=True,  # sort within each batch
+                                              repeat=False)  # repeat the iterator for
     correct, total = 0, 0
     total_valid_loss = 0
     for i, batch in enumerate(data_iter):
-        output = model(batch.dataset.data) # Check this input data format
+        output = model(torch.tensor(batch.dataset.data).unsqueeze(0)) # Check this input data format
         pred = output.max(1, keepdim=True)[1]
-        correct += pred.eq(batch.label.view_as(pred)).sum().item()
-        labels = batch.label
-        total += len(batch.label)
-        loss = criterion(output, labels.long())
+        labels = batch.dataset.label
+        labels = torch.tensor(labels).unsqueeze(0)
+        correct += pred.eq(labels.view_as(pred)).sum().item()
+        total += labels.shape[0]
+        loss = criterion(output, labels)
         total_valid_loss += loss.item()
     return correct / total, float(total_valid_loss) /(i+1)
 
@@ -99,7 +107,14 @@ def get_model_name(name, batch_size, learning_rate, epoch,momentum):
                                                    epoch,momentum)
     return path
 
-def train_model(model, train_iterator, valid_iterator, batch_size = 32, learning_rate = 0.001, num_epochs = 30, momentum = 0.9):
+def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.001, num_epochs = 30, momentum = 0.9):
+    train_iter = torchtext.data.BucketIterator.splits(train_set,
+                                              batch_size=batch_size,
+                                              sort_key=lambda x: len(x.data),  # to minimize padding
+                                              sort_within_batch=True,  # sort within each batch
+                                              repeat=False)  # repeat the iterator for
+
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
     train_err = np.zeros(num_epochs)
@@ -107,16 +122,17 @@ def train_model(model, train_iterator, valid_iterator, batch_size = 32, learning
     val_err = np.zeros(num_epochs)
     val_loss = np.zeros(num_epochs)
     for epoch in range(num_epochs):
-        for i, batch in enumerate(train_iterator):
-            input_data = batch.dataset.data
+        for i, batch in enumerate(train_iter):
+            input_data = torch.tensor(batch.dataset.data).unsqueeze(0)
+            # print(input_data.shape)
             optimizer.zero_grad()
             outputs = model(input_data)
-            labels = batch.label
-            loss = criterion(outputs, labels.long())
+            labels = batch.dataset.label
+            loss = criterion(outputs, torch.tensor(labels).unsqueeze(0))
             loss.backward()
             optimizer.step()
-        train_err[epoch], train_loss[epoch] = get_accuracy(model, train_iterator, criterion, batch_size)
-        val_err[epoch], val_loss[epoch] = get_accuracy(model, valid_iterator, criterion, batch_size)
+        train_err[epoch], train_loss[epoch] = get_accuracy(model, train_set, criterion, batch_size)
+        val_err[epoch], val_loss[epoch] = get_accuracy(model, valid_set, criterion, batch_size)
         print(("Epoch {}: Train accuracy: {}, Train loss: {} |"+
                "Validation accuracy: {}, Validation loss: {}").format(
                    epoch + 1,
@@ -180,16 +196,10 @@ if __name__== "__main__":
     dataset = create_dataloader()
     train_set, valid_set, test_set = split_data(dataset)
 
-    #train_iter = torchtext.data.BucketIterator(train_set,
-    #                                           batch_size=32,
-    #                                           sort_key=lambda x: len(x.data),  # to minimize padding
-    #                                           sort_within_batch=True,  # sort within each batch
-    #                                           repeat=False)  # repeat the iterator for
-
     for train_data in train_set:
         for elem in train_data.data:
             if (len(elem) != 50):
                 print("shape not match")
-    train_iter = torchtext.data.Iterator.splits(train_set, batch_size=(32),sort_key=lambda x: len(x.data))
-    valid_iter = torchtext.data.Iterator.splits(valid_set, batch_size=(32),sort_key=lambda x: len(x.data))
-    train_model(model, train_iterator, valid_iterator, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
+
+    model = baseline_model.ToxicBaseLSTM()
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)

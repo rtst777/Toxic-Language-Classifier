@@ -5,7 +5,9 @@ from train_model import INPUT_SIZE
 class ToxicBaseLSTM(nn.Module):
     def __init__(self, input_size=INPUT_SIZE, hidden_size=INPUT_SIZE, num_classes=3):
         # one-hot embedding (preprocessing is outside of the model)
+        super(ToxicBaseLSTM, self).__init__()
         self.hidden_size = hidden_size
+        self.name = 'ToxicBaseLSTM'
         self.rnn = nn.LSTM(input_size, hidden_size, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
 
