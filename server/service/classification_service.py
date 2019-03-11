@@ -45,6 +45,9 @@ def predict(raw_input):
         model = getModel()
 
     clean_input = preprocess_input(raw_input)
+    if len(clean_input) == 0:
+        return json.dumps({"predicted_label": "neither", "confidence": 0.900}, cls=MyEncoder)
+
     clean_input = torch.tensor(clean_input).unsqueeze(0)
     output = model(clean_input)
     softmax = nn.Softmax()
