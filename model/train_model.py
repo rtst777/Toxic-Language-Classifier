@@ -10,6 +10,7 @@ import codecs
 
 
 github_data_clean_data = "../data/cleaned_data/dataset1.csv"
+INPUT_SIZE = 50
 
 
 def set_global_seed(seed=37):
@@ -22,7 +23,7 @@ glove = None
 def convert_word_to_glove(text):
     global glove
     if glove is None:
-        glove = torchtext.vocab.GloVe(name="6B", dim=50)  # TODO tune number
+        glove = torchtext.vocab.GloVe(name="6B", dim=INPUT_SIZE)  # TODO tune number
 
     glove_text = [glove[x].tolist() for x in text]
     return glove_text
