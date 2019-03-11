@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from train_model import INPUT_SIZE
+from model.train_model import INPUT_SIZE
 
 class ToxicBaseLSTM(nn.Module):
     def __init__(self, input_size=INPUT_SIZE, hidden_size=INPUT_SIZE, num_classes=3):

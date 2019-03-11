@@ -7,7 +7,7 @@ import ast
 import re
 import json
 import codecs
-import baseline_model
+import model.baseline_model
 import torch.nn as nn
 import torch.optim as optim
 
@@ -201,5 +201,9 @@ if __name__== "__main__":
             if (len(elem) != 50):
                 print("shape not match")
 
-    model = baseline_model.ToxicBaseLSTM()
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
+    # model = baseline_model.ToxicBaseLSTM()
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
+
+    baseline_model = baseline_model.ToxicBaseLSTM()
+    saved_model_path = get_model_name(baseline_model.name, 32, 0.001, 0, 0.9)
+    baseline_model.load_state_dict(torch.load(saved_model_path))
