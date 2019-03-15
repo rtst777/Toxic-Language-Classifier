@@ -7,12 +7,10 @@ import ast
 import re
 import json
 import codecs
-import model.baseline_model
+from model.baseline_model import ToxicBaseLSTM
+from model.constants import INPUT_SIZE, github_data_clean_data
 import torch.nn as nn
 import torch.optim as optim
-
-github_data_clean_data = "../data/cleaned_data/dataset1.csv"
-INPUT_SIZE = 50
 
 
 def set_global_seed(seed=37):
@@ -201,9 +199,18 @@ if __name__== "__main__":
             if (len(elem) != 50):
                 print("shape not match")
 
+    data_iter = torchtext.data.BucketIterator(train_set,
+                                              batch_size=32,
+                                              sort_key=lambda x: len(x.data),  # to minimize padding
+                                              sort_within_batch=True,  # sort within each batch
+                                              repeat=False)  # repeat the iterator for
+
+
+
+
     # model = baseline_model.ToxicBaseLSTM()
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
 
-    baseline_model = baseline_model.ToxicBaseLSTM()
+    baseline_model = ToxicBaseLSTM()
     saved_model_path = get_model_name(baseline_model.name, 32, 0.001, 0, 0.9)
     baseline_model.load_state_dict(torch.load(saved_model_path))
