@@ -13,7 +13,6 @@ def add_message():
     text = content['input_text']
     print(text)
 
-    # TODO  input  "you"  give error
     prediction = predict(text)
     return prediction # prediction should already be in json form
 

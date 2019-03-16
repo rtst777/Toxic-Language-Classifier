@@ -133,7 +133,7 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
-    model = Glove_Based_LSTM_Model(index_to_vocab)
+    model = Glove_Based_LSTM_Model(index_to_vocab=index_to_vocab)
     train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
 
