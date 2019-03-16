@@ -138,7 +138,7 @@ if __name__== "__main__":
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
     model = FastText_Based_LSTM_Model(index_to_vocab=index_to_vocab)
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) #
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Train accuracy: 0.8680564895763282, Train loss: 0.3627691795108139 |Validation accuracy: 0.8615819209039548, Validation loss: 0.3758530813840128
 
 
     # baseline_model = ToxicBaseLSTM()
