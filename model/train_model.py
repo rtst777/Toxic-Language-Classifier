@@ -8,6 +8,7 @@ import re
 import json
 import codecs
 from model.baseline_model import ToxicBaseLSTM
+from model.glove_based_lstm_model import Glove_Based_LSTM_Model
 from model.constants import INPUT_SIZE, github_data_clean_data
 import torch.nn as nn
 import torch.optim as optim
@@ -19,72 +20,19 @@ def set_global_seed(seed=37):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
-glove = None
-def convert_word_to_glove(text):
-    global glove
-    if glove is None:
-        glove = torchtext.vocab.GloVe(name="6B", dim=INPUT_SIZE)  # TODO tune number
-
-    glove_text = [glove[x].tolist() for x in text]
-    return glove_text
-
-
-# def load_data_and_convert_to_glove():
-#     df = pd.read_csv(github_data_clean_data)
-#     subdf = df[['data', 'label']]
-#     subdf['data'] = subdf['data'].apply(lambda x: convert_word_to_glove(x))
-#
-#     converted_data = subdf[['data']].values
-#     converted_data = [arr.tolist() for arr in converted_data]
-#     label_numpy = subdf[['label']].values
-#     converted_label = [torch.from_numpy(label).squeeze(0) for label in label_numpy]
-#
-#     return list(zip(converted_data, converted_label))
-#
-#
-# # split data to train, valid, test set.
-# def get_splitted_data(dataset, train_ratio=0.7, val_ratio=0.15, test_ratio=0.15):
-#     data_size = len(dataset)
-#
-#     # shuffle data set
-#     random.shuffle(dataset)
-#
-#     # generate the index for randomly splitted training, validation, and test dataset
-#     train_val_boundary = int(data_size * train_ratio)
-#     val_test_boundary = int(data_size * (train_ratio + val_ratio))
-#     end_boundary = data_size
-#     train_data_set = dataset[0:train_val_boundary]
-#     val_data_set = dataset[train_val_boundary:val_test_boundary]
-#     test_data_set = dataset[val_test_boundary:end_boundary]
-#
-#     return train_data_set, val_data_set, test_data_set
-#
-#
-# def get_data_loader(dataset):
-#     data, label = zip(*dataset)
-#     data = list(data)
-#     label = list(label)
-#
-#     data_tensor = torch.tensor(data)
-#     label_tensor = torch.tensor(label)
-#
-#     return torch.utils.data.TensorDataset(data_tensor, label_tensor)
-
-
-
 def get_accuracy(model, data, criterion, batch_size):
-    data_iter = torchtext.data.BucketIterator.splits(data,
+    data_iter = torchtext.data.BucketIterator(train_set,
                                               batch_size=batch_size,
                                               sort_key=lambda x: len(x.data),  # to minimize padding
                                               sort_within_batch=True,  # sort within each batch
                                               repeat=False)  # repeat the iterator for
+
     correct, total = 0, 0
     total_valid_loss = 0
     for i, batch in enumerate(data_iter):
-        output = model(torch.tensor(batch.dataset.data).unsqueeze(0)) # Check this input data format
+        output = model(batch.data[0]) # Check this input data format
         pred = output.max(1, keepdim=True)[1]
-        labels = batch.dataset.label
-        labels = torch.tensor(labels).unsqueeze(0)
+        labels = batch.label
         correct += pred.eq(labels.view_as(pred)).sum().item()
         total += labels.shape[0]
         loss = criterion(output, labels)
@@ -106,12 +54,11 @@ def get_model_name(name, batch_size, learning_rate, epoch,momentum):
     return path
 
 def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.001, num_epochs = 30, momentum = 0.9):
-    train_iter = torchtext.data.BucketIterator.splits(train_set,
+    train_iter = torchtext.data.BucketIterator(train_set,
                                               batch_size=batch_size,
                                               sort_key=lambda x: len(x.data),  # to minimize padding
                                               sort_within_batch=True,  # sort within each batch
                                               repeat=False)  # repeat the iterator for
-
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
@@ -121,12 +68,11 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
     val_loss = np.zeros(num_epochs)
     for epoch in range(num_epochs):
         for i, batch in enumerate(train_iter):
-            input_data = torch.tensor(batch.dataset.data).unsqueeze(0)
-            # print(input_data.shape)
+            input_data = batch.data[0]
             optimizer.zero_grad()
             outputs = model(input_data)
-            labels = batch.dataset.label
-            loss = criterion(outputs, torch.tensor(labels).unsqueeze(0))
+            labels = batch.label
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
         train_err[epoch], train_loss[epoch] = get_accuracy(model, train_set, criterion, batch_size)
@@ -150,28 +96,32 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
 
 def tokenizer(word_str):
     list_of_word = ast.literal_eval(codecs.encode(word_str).decode("utf-8"))
-    return convert_word_to_glove(list_of_word)
+    return list_of_word
+    # return " ".join(list_of_word)
+    # return word_str
+    # return convert_word_to_glove(list_of_word)
 
-
+index_to_vocab = None
 def create_dataloader():
-    index_field = torchtext.data.Field(sequential=False,  # not a sequence
-                                       use_vocab=False,  # don't need to track vocabulary
-                                       is_target=True,
-                                       batch_first=True)  # convert text to 0 and
     word_field = torchtext.data.Field(sequential=True,  # text sequence
                                       tokenize=tokenizer,  # because are building a character-RNN
                                       include_lengths=True,  # to track the length of sequences, for batc
                                       batch_first=True,
-                                      use_vocab=False)  # to turn each character into an integer ind
+                                      use_vocab=True)  # to turn each character into an integer ind
     label_field = torchtext.data.Field(sequential=False,  # not a sequence
                                        use_vocab=False,  # don't need to track vocabulary
                                        is_target=True,
                                        batch_first=True,
                                        preprocessing=lambda x: int(x))  # convert text to 0 and
-    fields = [('index', index_field), ('data', word_field), ('label', label_field)]
+    fields = [('data', word_field), ('label', label_field)]
 
     dataset = torchtext.data.TabularDataset(path=github_data_clean_data, skip_header=True, format='csv', fields=fields)
-    return dataset
+    train_set, valid_set, test_set = split_data(dataset)
+    word_field.build_vocab(train_set)
+    global index_to_vocab
+    index_to_vocab = word_field.vocab.itos
+
+    return train_set, valid_set, test_set
 
 
 def split_data(dataset):
@@ -181,36 +131,15 @@ def split_data(dataset):
 
 if __name__== "__main__":
     set_global_seed()
-    # data_set = load_data_and_convert_to_glove()
-    # train_data_set, valid_data_set, test_data_set = get_splitted_data(data_set)
-    # train_data_loader = get_data_loader(train_data_set)
-    # valid_data_loader = get_data_loader(valid_data_set)
-    # test_data_loader = get_data_loader(test_data_set)
+    train_set, valid_set, test_set = create_dataloader()
 
-    # print(len(train_data_loader))
-    # print(len(valid_data_loader))
-    # print(len(test_data_loader))
-
-    dataset = create_dataloader()
-    train_set, valid_set, test_set = split_data(dataset)
-
-    for train_data in train_set:
-        for elem in train_data.data:
-            if (len(elem) != 50):
-                print("shape not match")
-
-    data_iter = torchtext.data.BucketIterator(train_set,
-                                              batch_size=32,
-                                              sort_key=lambda x: len(x.data),  # to minimize padding
-                                              sort_within_batch=True,  # sort within each batch
-                                              repeat=False)  # repeat the iterator for
+    model = Glove_Based_LSTM_Model(index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
 
 
+    # baseline_model = ToxicBaseLSTM()
+    # saved_model_path = get_model_name(baseline_model.name, 32, 0.001, 0, 0.9)
+    # baseline_model.load_state_dict(torch.load(saved_model_path))
+    #
 
-    # model = baseline_model.ToxicBaseLSTM()
-    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
-
-    baseline_model = ToxicBaseLSTM()
-    saved_model_path = get_model_name(baseline_model.name, 32, 0.001, 0, 0.9)
-    baseline_model.load_state_dict(torch.load(saved_model_path))
