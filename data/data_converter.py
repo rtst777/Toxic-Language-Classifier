@@ -49,7 +49,7 @@ def convert_github_data():
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
 
     # save cleaned data to file
-    subdf.to_csv(path_or_buf=github_data_cleaned_file_name)
+    subdf.to_csv(path_or_buf=github_data_cleaned_file_name, index=False)
 
 
 # TODO
@@ -71,7 +71,7 @@ def convert_kaggle_train_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_stopwords(x))
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
-    subdf.to_csv(path_or_buf=kaggle_data_cleaned_train_file_name)
+    subdf.to_csv(path_or_buf=kaggle_data_cleaned_train_file_name, index=False)
 
 def convert_kaggle_test_data():
     df_data = pd.read_csv(kaggle_data_raw_test_data_file_name)
@@ -91,7 +91,7 @@ def convert_kaggle_test_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_stopwords(x))
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
-    subdf.to_csv(path_or_buf=kaggle_data_cleaned_test_file_name )
+    subdf.to_csv(path_or_buf=kaggle_data_cleaned_test_file_name, index=False)
 
 if __name__== "__main__":
     convert_github_data()
