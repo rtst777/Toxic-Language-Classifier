@@ -8,6 +8,7 @@ import re
 import json
 import codecs
 from model.baseline_model import ToxicBaseLSTM
+from model.fasttext_based_lstm_model import FastText_Based_LSTM_Model
 from model.glove_based_lstm_model import Glove_Based_LSTM_Model
 from model.constants import INPUT_SIZE, github_data_clean_data
 import torch.nn as nn
@@ -21,7 +22,7 @@ def set_global_seed(seed=37):
     torch.cuda.manual_seed_all(seed)
 
 def get_accuracy(model, data, criterion, batch_size):
-    data_iter = torchtext.data.BucketIterator(train_set,
+    data_iter = torchtext.data.BucketIterator(data,
                                               batch_size=batch_size,
                                               sort_key=lambda x: len(x.data),  # to minimize padding
                                               sort_within_batch=True,  # sort within each batch
@@ -133,9 +134,11 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
-    model = Glove_Based_LSTM_Model(index_to_vocab=index_to_vocab)
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
+    # model = Glove_Based_LSTM_Model(index_to_vocab=index_to_vocab)
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
+    model = FastText_Based_LSTM_Model(index_to_vocab=index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) #
 
 
     # baseline_model = ToxicBaseLSTM()

@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from model.constants import INPUT_SIZE
+from model.constants import GLOVE_INPUT_SIZE
 
 class ToxicBaseLSTM(nn.Module):
-    def __init__(self, input_size=INPUT_SIZE, hidden_size=INPUT_SIZE, num_classes=3):
+    def __init__(self, input_size=GLOVE_INPUT_SIZE, hidden_size=GLOVE_INPUT_SIZE, num_classes=3):
         # one-hot embedding (preprocessing is outside of the model)
         super(ToxicBaseLSTM, self).__init__()
         self.hidden_size = hidden_size
