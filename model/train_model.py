@@ -10,7 +10,7 @@ import codecs
 from model.baseline_model import ToxicBaseLSTM
 from model.fasttext_based_lstm_model import FastText_Based_LSTM_Model
 from model.glove_based_lstm_model import Glove_Based_LSTM_Model
-from model.constants import INPUT_SIZE, github_data_clean_data
+from model.constants import github_data_clean_data
 import torch.nn as nn
 import torch.optim as optim
 
