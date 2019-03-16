@@ -3,9 +3,9 @@ import torch.nn as nn
 from model.constants import GLOVE_INPUT_SIZE
 import torchtext
 
-class Glove_Based_LSTM_Model(nn.Module):
+class GloveBasedLSTMModel(nn.Module):
     def __init__(self, index_to_vocab=None, input_size=GLOVE_INPUT_SIZE, hidden_size=GLOVE_INPUT_SIZE, num_classes=3):
-        super(Glove_Based_LSTM_Model, self).__init__()
+        super(GloveBasedLSTMModel, self).__init__()
         self.index_to_vocab = index_to_vocab
         self.glove = torchtext.vocab.GloVe(name="6B", dim=GLOVE_INPUT_SIZE)  # TODO tune number
         self.hidden_size = hidden_size

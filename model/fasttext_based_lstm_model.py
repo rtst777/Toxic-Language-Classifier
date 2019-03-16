@@ -3,9 +3,9 @@ import torch.nn as nn
 from model.constants import FAST_TEXT_INPUT_SIZE
 import torchtext
 
-class FastText_Based_LSTM_Model(nn.Module):
+class FastTextBasedLSTMModel(nn.Module):
     def __init__(self, index_to_vocab=None, input_size=FAST_TEXT_INPUT_SIZE, hidden_size=FAST_TEXT_INPUT_SIZE, num_classes=3):
-        super(FastText_Based_LSTM_Model, self).__init__()
+        super(FastTextBasedLSTMModel, self).__init__()
         self.index_to_vocab = index_to_vocab
         self.fasttext = torchtext.vocab.FastText(language='simple')  # TODO tune number
         self.hidden_size = hidden_size

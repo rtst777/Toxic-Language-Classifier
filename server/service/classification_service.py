@@ -1,7 +1,8 @@
 from model.baseline_model import ToxicBaseLSTM
 from model.dummy_model import DummyNet
 from model.train_model import get_model_name
-from model.glove_based_lstm_model import Glove_Based_LSTM_Model
+from model.glove_based_lstm_model import GloveBasedLSTMModel
+from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from data.data_converter import remove_punct, tokenization, remove_stopwords, remove_empty_string_token, lower_case_text
 import torch
 from torch import nn
@@ -21,7 +22,8 @@ class MyEncoder(json.JSONEncoder):
 
 
 def getModel():
-    model = Glove_Based_LSTM_Model()
+    # model = GloveBasedLSTMModel()
+    model = FastTextBasedLSTMModel()
     saved_model_path = get_model_name(model.name, 32, 0.001, 29, 0.9)
     model.load_state_dict(torch.load(saved_model_path))
     return model
@@ -34,7 +36,6 @@ def preprocess_input(rawinput):
     rawinput = remove_stopwords(rawinput)
     rawinput = remove_empty_string_token(rawinput)
     clean_input = lower_case_text(rawinput)
-    # TODO might need to convert to GloVe embedding
     return clean_input
 
 label = ["hate", "offensive", "neither"]

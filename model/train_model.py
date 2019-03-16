@@ -8,8 +8,8 @@ import re
 import json
 import codecs
 from model.baseline_model import ToxicBaseLSTM
-from model.fasttext_based_lstm_model import FastText_Based_LSTM_Model
-from model.glove_based_lstm_model import Glove_Based_LSTM_Model
+from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
+from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.constants import github_data_clean_data
 import torch.nn as nn
 import torch.optim as optim
@@ -134,10 +134,10 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
-    # model = Glove_Based_LSTM_Model(index_to_vocab=index_to_vocab)
+    # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
-    model = FastText_Based_LSTM_Model(index_to_vocab=index_to_vocab)
+    model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
     train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Train accuracy: 0.8680564895763282, Train loss: 0.3627691795108139 |Validation accuracy: 0.8615819209039548, Validation loss: 0.3758530813840128
 
 
