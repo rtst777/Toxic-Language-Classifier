@@ -3,6 +3,7 @@ from model.dummy_model import DummyNet
 from model.train_model import get_model_name
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
+from model.ensemble_models import EnsembleModels
 from data.data_converter import remove_punct, tokenization, remove_stopwords, remove_empty_string_token, lower_case_text
 import torch
 from torch import nn
@@ -21,13 +22,28 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-def getModel():
-    # model = GloveBasedLSTMModel()
-    model = FastTextBasedLSTMModel()
-    saved_model_path = get_model_name(model.name, 32, 0.001, 29, 0.9)
-    model.load_state_dict(torch.load(saved_model_path))
-    return model
+# def getModel():
+#     # model = GloveBasedLSTMModel()
+#     model = FastTextBasedLSTMModel()
+#     saved_model_path = get_model_name(model.name, 32, 0.001, 29, 0.9)
+#     model.load_state_dict(torch.load(saved_model_path))
+#     return model
     # return DummyNet()
+
+
+def getModel():
+    model1 = GloveBasedLSTMModel()
+    saved_model_path1 = get_model_name(model1.name, 32, 0.001, 29, 0.9)
+    model1.load_state_dict(torch.load(saved_model_path1))
+
+    model2 = FastTextBasedLSTMModel()
+    saved_model_path2 = get_model_name(model2.name, 32, 0.001, 29, 0.9)
+    model2.load_state_dict(torch.load(saved_model_path2))
+
+    model_and_score = [(model1, 1), (model2, 1)]
+    policy = "highest_weights"
+
+    return EnsembleModels(model_and_score, policy)
 
 
 def preprocess_input(rawinput):
