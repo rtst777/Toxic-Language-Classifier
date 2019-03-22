@@ -35,3 +35,5 @@ class FastTextBasedLSTMModel(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
+    def canProcess(self, token):
+        return not torch.equal(self.fasttext[token], torch.zeros(FAST_TEXT_INPUT_SIZE))

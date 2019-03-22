@@ -36,3 +36,5 @@ class GloveBasedLSTMModel(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
+    def canProcess(self, token):
+        return not torch.equal(self.glove[token], torch.zeros(GLOVE_INPUT_SIZE))
