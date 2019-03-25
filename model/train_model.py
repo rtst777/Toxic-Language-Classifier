@@ -10,12 +10,13 @@ import codecs
 from model.baseline_model import ToxicBaseLSTM
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
+from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
 from model.char_based_model import Char_based_RNN
 from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data,merged_cleaned_test_data
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-IS_CHAR = True
+IS_CHAR = False
 
 def set_global_seed(seed=37):
     np.random.seed(seed)
@@ -212,6 +213,9 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
+    model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
+
     # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
@@ -220,11 +224,11 @@ if __name__== "__main__":
     #print(max_val+1)
     #model = Char_based_RNN(max_val+1,max_val+1,3)
     #train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
-    model = Char_based_RNN(33, 33, 3)
-    model.load_state_dict(torch.load('model_Char_based_RNN_bs32_lr0.001_epoch29_momentum_0.9'))
-    output = model(['hello'])
-    print(output)
-    output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
-    print(output)
+    # model = Char_based_RNN(33, 33, 3)
+    # model.load_state_dict(torch.load('model_Char_based_RNN_bs32_lr0.001_epoch29_momentum_0.9'))
+    # output = model(['hello'])
+    # print(output)
+    # output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
+    # print(output)
     #plot_training_curve(get_model_name("Char_based_RNN", 32, 0.001, 29, 0.9))
 
