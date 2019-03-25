@@ -4,6 +4,7 @@ from model.train_model import get_model_name
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.ensemble_models import EnsembleModels
+from model.char_based_model import Char_based_RNN
 from data.data_converter import remove_punct, tokenization, remove_stopwords, remove_empty_string_token, lower_case_text
 import torch
 from torch import nn
@@ -24,11 +25,12 @@ class MyEncoder(json.JSONEncoder):
 
 # def getModel():
 #     # model = GloveBasedLSTMModel()
-#     model = FastTextBasedLSTMModel()
+#     # model = FastTextBasedLSTMModel()
+#     model = Char_based_RNN()
 #     saved_model_path = get_model_name(model.name, 32, 0.001, 29, 0.9)
 #     model.load_state_dict(torch.load(saved_model_path))
 #     return model
-    # return DummyNet()
+#     # return DummyNet()
 
 
 def getModel():
@@ -40,7 +42,11 @@ def getModel():
     saved_model_path2 = get_model_name(model2.name, 32, 0.001, 29, 0.9)
     model2.load_state_dict(torch.load(saved_model_path2))
 
-    model_and_score = [(model1, 1), (model2, 1)]
+    model3 = Char_based_RNN()
+    saved_model_path3 = get_model_name(model3.name, 32, 0.001, 29, 0.9)
+    model3.load_state_dict(torch.load(saved_model_path3))
+
+    model_and_score = [(model1, 2), (model2, 2), (model3, 1)]
     policy = "highest_weights"
 
     return EnsembleModels(model_and_score, policy)

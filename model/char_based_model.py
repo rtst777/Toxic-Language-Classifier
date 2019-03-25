@@ -3,7 +3,7 @@ import torch.nn as nn
 import json
 from model.constants import *
 class Char_based_RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
+    def __init__(self, input_size=33, hidden_size=33, num_classes=3):
         super(Char_based_RNN, self).__init__()
         self.name = "Char_based_RNN"
         self.hidden_size = hidden_size
