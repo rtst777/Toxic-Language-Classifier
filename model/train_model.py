@@ -11,7 +11,7 @@ from model.baseline_model import ToxicBaseLSTM
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.char_based_model import Char_based_RNN
-from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data
+from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data,merged_cleaned_test_data
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
@@ -34,8 +34,6 @@ def get_accuracy(model, data, criterion, batch_size):
     total_valid_loss = 0
     for i, batch in enumerate(data_iter):
         input_data = batch.data[0]
-        if IS_CHAR:
-            input_data = data_to_one_hot(input_data)
         output = model(input_data) # Check this input data format
         pred = output.max(1, keepdim=True)[1]
         labels = batch.label
@@ -75,8 +73,6 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
     for epoch in range(num_epochs):
         for i, batch in enumerate(train_iter):
             input_data = batch.data[0]
-            if IS_CHAR:
-                input_data = data_to_one_hot(input_data)
             optimizer.zero_grad()
             outputs = model(input_data)
             labels = batch.label
@@ -149,16 +145,21 @@ def create_dataloader():
 
     dataset1 = torchtext.data.TabularDataset(path=github_cleaned_data, skip_header=True, format='csv', fields=fields)
     # TODO concatenate three datasets
-    # dataset2 = torchtext.data.TabularDataset(path=kaggle_cleaned_train_data, skip_header=True, format='csv', fields=fields)
+    #dataset2 = torchtext.data.TabularDataset(path=kaggle_cleaned_train_data, skip_header=True, format='csv', fields=fields)
     # dataset3 = torchtext.data.TabularDataset(path=kaggle_cleaned_test_data, skip_header=True, format='csv', fields=fields)
-
+    #full_data = torchtext.data.TabularDataset(path=merged_cleaned_test_data, skip_header=True, format='csv',
+     #                                        fields=fields)
     train_set, valid_set, test_set = split_data(dataset1)
 
     # create vocabulary index
     word_field.build_vocab(train_set)
+
     if IS_CHAR:
         global max_val
         max_val = max(word_field.vocab.stoi.values())
+        with open('char_rnn_stoi.json', 'w') as f:
+            json.dump(word_field.vocab.stoi,f)
+
     global index_to_vocab
     index_to_vocab = word_field.vocab.itos
     # balance training set data
@@ -197,12 +198,6 @@ def plot_training_curve(path):
     plt.legend(loc='best')
     plt.show()
 
-def data_to_one_hot(x):
-    ident = torch.eye(max_val+1)
-    return ident[x]
-
-def one_hot_to_data(x):
-    return torch.argmax(x)
 
 if __name__== "__main__":
     set_global_seed()
@@ -213,8 +208,14 @@ if __name__== "__main__":
 
     # model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.9196421407365802, Train loss: 0.264950641202567 |Validation accuracy: 0.8660209846650525, Validation loss: 0.3871996518104307
-
+    #print(max_val+1)
     #model = Char_based_RNN(max_val+1,max_val+1,3)
     #train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
-    plot_training_curve(get_model_name("Char_based_RNN", 32, 0.001, 29, 0.9))
+    model = Char_based_RNN(33, 33, 3)
+    model.load_state_dict(torch.load('model_Char_based_RNN_bs32_lr0.001_epoch29_momentum_0.9'))
+    output = model(['hello'])
+    print(output)
+    output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
+    print(output)
+    #plot_training_curve(get_model_name("Char_based_RNN", 32, 0.001, 29, 0.9))
 
