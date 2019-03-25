@@ -10,12 +10,14 @@ import codecs
 from model.baseline_model import ToxicBaseLSTM
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
+from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
 from model.char_based_model import Char_based_RNN
-from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data,merged_cleaned_test_data,cuda
+from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data,merged_cleaned_test_data
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-IS_CHAR = True
+IS_CHAR = False
+
 def set_global_seed(seed=37):
     np.random.seed(seed)
     random.seed(seed)
@@ -35,7 +37,7 @@ def get_accuracy(model, data, criterion, batch_size):
         input_data = batch.data[0]
         output = model(input_data) # Check this input data format
         pred = output.max(1, keepdim=True)[1]
-        labels = batch.label.to(cuda)
+        labels = batch.label
         correct += pred.eq(labels.view_as(pred)).sum().item()
         total += labels.shape[0]
         loss = criterion(output, labels)
@@ -61,7 +63,7 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
                                               batch_size=batch_size,
                                               sort_key=lambda x: len(x.data),  # to minimize padding
                                               sort_within_batch=True,  # sort within each batch
-                                              repeat=False, device = cuda )  # repeat the iterator for
+                                              repeat=False)  # repeat the iterator for
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, betas=(0.9,0.999))
@@ -71,10 +73,10 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
     val_loss = np.zeros(num_epochs)
     for epoch in range(num_epochs):
         for i, batch in enumerate(train_iter):
-            input_data = batch.data[0].to(cuda)
+            input_data = batch.data[0]
             optimizer.zero_grad()
             outputs = model(input_data)
-            labels = batch.label.to(cuda)
+            labels = batch.label
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -151,15 +153,13 @@ def create_dataloader():
                                        preprocessing=lambda x: int(x))  # convert text to 0 and
     fields = [('data', word_field), ('label', label_field)]
 
-    #dataset1 = torchtext.data.TabularDataset(path=github_cleaned_data, skip_header=True, format='csv', fields=fields)
+    dataset1 = torchtext.data.TabularDataset(path=github_cleaned_data, skip_header=True, format='csv', fields=fields)
     # TODO concatenate three datasets
-    dataset2 = torchtext.data.TabularDataset(path=kaggle_cleaned_train_data, skip_header=True, format='csv', fields=fields)
-    #dataset3 = torchtext.data.TabularDataset(path=kaggle_cleaned_test_data, skip_header=True, format='csv', fields=fields)
+    #dataset2 = torchtext.data.TabularDataset(path=kaggle_cleaned_train_data, skip_header=True, format='csv', fields=fields)
+    # dataset3 = torchtext.data.TabularDataset(path=kaggle_cleaned_test_data, skip_header=True, format='csv', fields=fields)
     #full_data = torchtext.data.TabularDataset(path=merged_cleaned_test_data, skip_header=True, format='csv',
      #                                        fields=fields)
-    #dataset4 = torchtext.data.TabularDataset(path="../data/cleaned_data/dataset4.csv", skip_header=True, format='csv',
-    #                                        fields=fields)
-    train_set, valid_set, test_set = split_data(dataset2)
+    train_set, valid_set, test_set = split_data(dataset1)
 
     # create vocabulary index
     word_field.build_vocab(train_set)
@@ -177,15 +177,6 @@ def create_dataloader():
 
     return train_set, valid_set, test_set
 
-def test_data(dataset, dict_path):
-    with open('char_rnn_stoi.json', 'w') as f:
-        dict = json.load(f)
-
-    word_field = torchtext.data.Field(sequential=True,  # text sequence
-                                      tokenize=tokenizer,  # because are building a character-RNN
-                                      include_lengths=True,  # to track the length of sequences, for batc
-                                      batch_first=True,
-                                      use_vocab=True)  # to turn each character into an integer ind
 
 def split_data(dataset):
     train_set, valid_set, test_set = dataset.split([0.6, 0.2, 0.2], random_state=random.getstate())
@@ -222,13 +213,23 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
+    model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
+
     # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
-    #model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
+    # model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.9196421407365802, Train loss: 0.264950641202567 |Validation accuracy: 0.8660209846650525, Validation loss: 0.3871996518104307
     #print(max_val+1)
     #model = Char_based_RNN(max_val+1,max_val+1,3)
+    #train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
+    # model = Char_based_RNN(33, 33, 3)
+    # model.load_state_dict(torch.load('model_Char_based_RNN_bs32_lr0.001_epoch29_momentum_0.9'))
+    # output = model(['hello'])
+    # print(output)
+    # output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
+    # print(output)
     #train_model(model.cuda(), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
 
 
