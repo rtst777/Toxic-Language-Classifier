@@ -8,8 +8,9 @@ class Char_based_RNN(nn.Module):
         self.name = "Char_based_RNN"
         self.hidden_size = hidden_size
         self.rnn = nn.RNN(input_size, hidden_size, batch_first=True)
-        self.fc = nn.Linear(hidden_size, num_classes)
-
+        self.fc1 = nn.Linear(hidden_size, 17)
+        self.fc2 = nn.Linear(17, 9)
+        self.fc3 = nn.Linear(9, num_classes)
     def forward(self, x):
         # Set an initial hidden state
         if (isinstance(x[0], str)):
@@ -30,9 +31,11 @@ class Char_based_RNN(nn.Module):
             input = self.data_to_one_hot(x)
             h0 = torch.zeros(1, input.size(0), self.hidden_size)
         # Forward propagate the RNN
-        out, _ = self.rnn(input, h0)
+        out, _ = self.rnn(input.to(cuda), h0.to(cuda))
         # Pass the output of the last time step to the classifier
-        out = self.fc(torch.max(out, dim=1)[0])
+        out = self.fc1(torch.max(out, dim=1)[0])
+        out = self.fc2(out)
+        out = self.fc3(out)
         return out
 
     def data_to_one_hot(self,x):

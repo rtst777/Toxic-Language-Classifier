@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import string
 import nltk
+import numpy as np
 
 github_data_raw_file_name = "github/labeled_data.csv"
 github_data_cleaned_file_name = "cleaned_data/dataset1.csv"
@@ -34,7 +35,8 @@ def lower_case_text(text):
     text = [x.lower() for x in text]
 
     return text
-
+def clean_unicode(text):
+    return [x.encode('ascii', 'ignore') for x in text]
 def convert_github_data():
     df = pd.read_csv(github_data_raw_file_name)
     subdf = df[['tweet', 'class']]
@@ -47,11 +49,15 @@ def convert_github_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_stopwords(x))
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
-
+    subdf['data'] = subdf['data'].apply(lambda x: clean_unicode(x))
     # save cleaned data to file
     subdf.to_csv(path_or_buf=github_data_cleaned_file_name, index=False)
+    idx_list = np.random.randint(low=0, high=len(subdf) - 1, size=int(len(subdf) / div)).tolist()
+    newdf = subdf.iloc[idx_list,:]
+    newdf.to_csv(path_or_buf="cleaned_data/dataset4.csv", index=False)
     if merge:
         subdf.to_csv(path_or_buf="cleaned_data/Dataset_Merged.csv", index=False)
+
 # TODO
 def convert_kaggle_train_data():
     df = pd.read_csv(kaggle_data_raw_train_file_name)
@@ -71,6 +77,10 @@ def convert_kaggle_train_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_stopwords(x))
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
+    subdf['data'] = subdf['data'].apply(lambda x: clean_unicode(x))
+    idx_list = np.random.randint(low=0, high=len(subdf)-1, size=int(len(subdf)/div)).tolist()
+    newdf = subdf.iloc[idx_list,:]
+    newdf.to_csv(path_or_buf="cleaned_data/dataset4.csv", index=False)
     subdf.to_csv(path_or_buf=kaggle_data_cleaned_train_file_name, index=False)
     if merge:
         subdf.to_csv(path_or_buf="cleaned_data/Dataset_Merged.csv", mode='a', header=False,index=False)
@@ -93,6 +103,10 @@ def convert_kaggle_test_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_stopwords(x))
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
+    subdf['data'] = subdf['data'].apply(lambda x: clean_unicode(x))
+    idx_list = np.random.randint(low=0, high=len(subdf)-1, size=int(len(subdf)/div)).tolist()
+    newdf = subdf.iloc[idx_list,:]
+    newdf.to_csv(path_or_buf="cleaned_data/dataset4.csv", index=False)
     subdf.to_csv(path_or_buf=kaggle_data_cleaned_test_file_name, index=False)
     if merge:
         subdf.to_csv(path_or_buf="cleaned_data/Dataset_Merged.csv", mode='a', header=False, index=False)
@@ -100,6 +114,9 @@ def convert_kaggle_test_data():
 if __name__== "__main__":
     global merge
     merge = False
+    global div
+    div = 25
+    np.random.seed(seed=420)
     convert_github_data()
     convert_kaggle_train_data()
     convert_kaggle_test_data()
