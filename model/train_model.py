@@ -110,16 +110,25 @@ def balance_data_set(data_set):
     old_examples = data_set.examples
 
     train_non_toxic_example = []
+    train_offensive_toxic_example = []
+    train_hate_speech_toxic_example = []
     for item in data_set.examples:
         if item.label == 2:
             train_non_toxic_example.append(item)
+        elif item.label == 0:
+            train_hate_speech_toxic_example.append(item)
+        elif item.label == 1:
+            train_offensive_toxic_example.append(item)
 
-    # duplicate non-toxic example
-    total_num_example = len(old_examples)
+
     total_num_non_toxic_example = len(train_non_toxic_example)
-    scale_factor = (total_num_example // total_num_non_toxic_example) - 1
+    total_num_offensive_example = len(train_offensive_toxic_example)
+    total_num_hate_speech_toxic_example = len(train_hate_speech_toxic_example)
 
-    data_set.examples = old_examples + train_non_toxic_example * scale_factor
+    # duplicate non-toxic and hate speech example
+    non_toxic_scale_factor = (total_num_offensive_example // total_num_non_toxic_example) - 1
+    hate_speech_toxic_scale_factor = (total_num_offensive_example // total_num_hate_speech_toxic_example) - 1
+    data_set.examples = old_examples + train_non_toxic_example * non_toxic_scale_factor + train_hate_speech_toxic_example * hate_speech_toxic_scale_factor
 
 index_to_vocab = None
 def create_dataloader():
