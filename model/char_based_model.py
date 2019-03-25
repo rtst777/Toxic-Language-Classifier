@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
-class Char_based_RNN(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
-        super(Char_based_RNN, self).__init__()
-        self.name = "Char_based_RNN"
+
+class CharBasedRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes=3):
+        super(CharBasedRNN, self).__init__()
+        self.name = "CharBasedRNN"
         self.hidden_size = hidden_size
         self.rnn = nn.RNN(input_size, hidden_size, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
@@ -16,3 +17,6 @@ class Char_based_RNN(nn.Module):
         # Pass the output of the last time step to the classifier
         out = self.fc(torch.max(out, dim=1)[0])
         return out
+
+    def canProcess(self, token):
+        return True
