@@ -32,12 +32,15 @@ def getModel():
     # model = GloveBasedAttentionLSTMModel()
     # model = FastTextBasedAttentionLSTMModel()
     saved_model_path = get_model_name(model.name, 256, 0.001, 18, 0.9)
-    model.load_state_dict(torch.load(saved_model_path, map_location='cpu'))
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    model.load_state_dict(torch.load(saved_model_path, map_location=device))
     return model
 #     # return DummyNet()
 
 
 # def getModel():
+#     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+#
 #     model1 = GloveBasedAttentionLSTMModel()
 #     saved_model_path1 = get_model_name(model1.name, 32, 0.001, 29, 0.9)
 #     model1.load_state_dict(torch.load(saved_model_path1))

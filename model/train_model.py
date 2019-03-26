@@ -12,12 +12,13 @@ from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
 from model.fasttext_based_attention_lstm import FastTextBasedAttentionLSTMModel
+from model.char_based_attention_model import CharBasedAttentionRNN
 from model.char_based_model import Char_based_RNN
 from model.constants import *
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
-IS_CHAR = False
+IS_CHAR = True
 
 def set_global_seed(seed=37):
     np.random.seed(seed)
@@ -220,11 +221,11 @@ if __name__== "__main__":
     # model = FastTextBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7847264345505277, Train loss: 0.5389000631933878 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4570241004228592
 
-    model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 29: Train accuracy: 0.8547252213999758, Train loss: 0.380580750385265 |Validation accuracy: 0.8266747376916869, Validation loss: 0.46899683312062296
+    # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 29: Train accuracy: 0.8547252213999758, Train loss: 0.380580750385265 |Validation accuracy: 0.8266747376916869, Validation loss: 0.46899683312062296
 
-    model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7729588741962877, Train loss: 0.5484655738801891 |Validation accuracy: 0.8264729620661824, Validation loss: 0.45265432788479715
+    # model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7729588741962877, Train loss: 0.5484655738801891 |Validation accuracy: 0.8264729620661824, Validation loss: 0.45265432788479715
     #print(max_val+1)
     #model = Char_based_RNN(max_val+1,max_val+1,3)
     #train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
@@ -234,7 +235,8 @@ if __name__== "__main__":
     # print(output)
     # output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
     # print(output)
-    #train_model(model.cuda(), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
+    model = CharBasedAttentionRNN()
+    train_model(model.to(device), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
 
 
     model = Char_based_RNN(33, 33, 3).to(device)
