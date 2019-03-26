@@ -11,6 +11,7 @@ from model.baseline_model import ToxicBaseLSTM
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
+from model.fasttext_based_attention_lstm import FastTextBasedAttentionLSTMModel
 from model.char_based_model import Char_based_RNN
 from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data,merged_cleaned_test_data
 import torch.nn as nn
@@ -213,8 +214,11 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
-    model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
+    # model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
+
+    model = FastTextBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7847264345505277, Train loss: 0.5389000631933878 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4570241004228592
 
     # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
