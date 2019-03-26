@@ -11,6 +11,7 @@ class Char_based_RNN(nn.Module):
         self.fc1 = nn.Linear(hidden_size, 17)
         self.fc2 = nn.Linear(17, 9)
         self.fc3 = nn.Linear(9, num_classes)
+        self.device = device
     def forward(self, x):
         # Set an initial hidden state
         if (isinstance(x[0], str)):
@@ -31,7 +32,7 @@ class Char_based_RNN(nn.Module):
             input = self.data_to_one_hot(x)
             h0 = torch.zeros(1, input.size(0), self.hidden_size)
         # Forward propagate the RNN
-        out, _ = self.rnn(input.to(cuda), h0.to(cuda))
+        out, _ = self.rnn(input.to(self.device), h0.to(self.device))
         # Pass the output of the last time step to the classifier
         out = self.fc1(torch.max(out, dim=1)[0])
         out = self.fc2(out)

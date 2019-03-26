@@ -7,7 +7,7 @@ from model.fasttext_based_attention_lstm import FastTextBasedAttentionLSTMModel
 from model.ensemble_models import EnsembleModels
 from model.char_based_model import Char_based_RNN
 from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
-from data.data_converter import remove_punct, tokenization, remove_stopwords, remove_empty_string_token, lower_case_text
+from data.data_converter import remove_punct, tokenization, remove_stopwords, remove_empty_string_token, lower_case_text, clean_unicode
 import torch
 from torch import nn
 import json
@@ -25,35 +25,35 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-# def getModel():
+def getModel():
     # model = GloveBasedLSTMModel()
     # model = FastTextBasedLSTMModel()
-    # model = Char_based_RNN()
+    model = Char_based_RNN()
     # model = GloveBasedAttentionLSTMModel()
     # model = FastTextBasedAttentionLSTMModel()
-    # saved_model_path = get_model_name(model.name, 32, 0.001, 16, 0.9)
-    # model.load_state_dict(torch.load(saved_model_path))
-    # return model
+    saved_model_path = get_model_name(model.name, 256, 0.001, 18, 0.9)
+    model.load_state_dict(torch.load(saved_model_path, map_location='cpu'))
+    return model
 #     # return DummyNet()
 
 
-def getModel():
-    model1 = GloveBasedAttentionLSTMModel()
-    saved_model_path1 = get_model_name(model1.name, 32, 0.001, 29, 0.9)
-    model1.load_state_dict(torch.load(saved_model_path1))
-
-    model2 = FastTextBasedAttentionLSTMModel()
-    saved_model_path2 = get_model_name(model2.name, 32, 0.001, 16, 0.9)
-    model2.load_state_dict(torch.load(saved_model_path2))
-
-    model3 = Char_based_RNN()
-    saved_model_path3 = get_model_name(model3.name, 32, 0.001, 29, 0.9)
-    model3.load_state_dict(torch.load(saved_model_path3))
-
-    model_and_score = [(model1, 2), (model2, 2), (model3, 1)]
-    policy = "highest_weights"
-
-    return EnsembleModels(model_and_score, policy)
+# def getModel():
+#     model1 = GloveBasedAttentionLSTMModel()
+#     saved_model_path1 = get_model_name(model1.name, 32, 0.001, 29, 0.9)
+#     model1.load_state_dict(torch.load(saved_model_path1))
+#
+#     model2 = FastTextBasedAttentionLSTMModel()
+#     saved_model_path2 = get_model_name(model2.name, 32, 0.001, 16, 0.9)
+#     model2.load_state_dict(torch.load(saved_model_path2))
+#
+#     model3 = Char_based_RNN()
+#     saved_model_path3 = get_model_name(model3.name, 256, 0.001, 18, 0.9)
+#     model3.load_state_dict(torch.load(saved_model_path3, map_location='cpu'))
+#
+#     model_and_score = [(model1, 2), (model2, 2), (model3, 1)]
+#     policy = "highest_weights"
+#
+#     return EnsembleModels(model_and_score, policy)
 
 
 def preprocess_input(rawinput):

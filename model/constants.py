@@ -6,4 +6,4 @@ GLOVE_INPUT_SIZE = 50
 FAST_TEXT_INPUT_SIZE = 300
 CHAR_HIDDEN = 33#dataset1: 33#merged:3818
 import torch
-cuda = torch.device('cuda')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

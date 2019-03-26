@@ -13,7 +13,7 @@ from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
 from model.fasttext_based_attention_lstm import FastTextBasedAttentionLSTMModel
 from model.char_based_model import Char_based_RNN
-from model.constants import github_cleaned_data, kaggle_cleaned_train_data, kaggle_cleaned_test_data,merged_cleaned_test_data
+from model.constants import *
 import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
@@ -237,7 +237,7 @@ if __name__== "__main__":
     #train_model(model.cuda(), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
 
 
-    model = Char_based_RNN(33, 33, 3).cuda()
+    model = Char_based_RNN(33, 33, 3).to(device)
     model.load_state_dict(torch.load('model_Char_based_RNN_bs256_lr0.001_epoch18_momentum_0.9'))
     #criterion = nn.CrossEntropyLoss()
     #err,loss = get_accuracy(model, test_set , criterion, 32)
