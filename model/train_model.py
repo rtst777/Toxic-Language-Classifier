@@ -67,7 +67,7 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
                                               repeat=False)  # repeat the iterator for
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate, betas=(0.9,0.999))
     train_err = np.zeros(num_epochs)
     train_loss = np.zeros(num_epochs)
     val_err = np.zeros(num_epochs)
@@ -234,5 +234,17 @@ if __name__== "__main__":
     # print(output)
     # output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
     # print(output)
+    #train_model(model.cuda(), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
+
+
+    model = Char_based_RNN(33, 33, 3).cuda()
+    model.load_state_dict(torch.load('model_Char_based_RNN_bs256_lr0.001_epoch18_momentum_0.9'))
+    #criterion = nn.CrossEntropyLoss()
+    #err,loss = get_accuracy(model, test_set , criterion, 32)
+    #print(err)
+    #output = model(['hello'])
+    #print(output)
+    #output = model(['bitches', 'get', 'shit', 'everyday', 'b'])
+    #print(output)
     #plot_training_curve(get_model_name("Char_based_RNN", 32, 0.001, 29, 0.9))
 
