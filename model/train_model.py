@@ -217,14 +217,14 @@ if __name__== "__main__":
     # model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
 
-    model = FastTextBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
-    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7847264345505277, Train loss: 0.5389000631933878 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4570241004228592
+    # model = FastTextBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7847264345505277, Train loss: 0.5389000631933878 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4570241004228592
 
-    # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
-    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
+    model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 29: Train accuracy: 0.8547252213999758, Train loss: 0.380580750385265 |Validation accuracy: 0.8266747376916869, Validation loss: 0.46899683312062296
 
-    # model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
-    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.9196421407365802, Train loss: 0.264950641202567 |Validation accuracy: 0.8660209846650525, Validation loss: 0.3871996518104307
+    model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
+    train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7729588741962877, Train loss: 0.5484655738801891 |Validation accuracy: 0.8264729620661824, Validation loss: 0.45265432788479715
     #print(max_val+1)
     #model = Char_based_RNN(max_val+1,max_val+1,3)
     #train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
