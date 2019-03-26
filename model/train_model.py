@@ -39,7 +39,7 @@ def get_accuracy(model, data, criterion, batch_size):
         input_data = batch.data[0]
         output = model(input_data) # Check this input data format
         pred = output.max(1, keepdim=True)[1]
-        labels = batch.label
+        labels = batch.label.to(device)
         correct += pred.eq(labels.view_as(pred)).sum().item()
         total += labels.shape[0]
         loss = criterion(output, labels)
@@ -78,7 +78,7 @@ def train_model(model, train_set, valid_set, batch_size = 32, learning_rate = 0.
             input_data = batch.data[0]
             optimizer.zero_grad()
             outputs = model(input_data)
-            labels = batch.label
+            labels = batch.label.to(device)
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -155,13 +155,13 @@ def create_dataloader():
                                        preprocessing=lambda x: int(x))  # convert text to 0 and
     fields = [('data', word_field), ('label', label_field)]
 
-    dataset1 = torchtext.data.TabularDataset(path=github_cleaned_data, skip_header=True, format='csv', fields=fields)
+    #dataset1 = torchtext.data.TabularDataset(path=github_cleaned_data, skip_header=True, format='csv', fields=fields)
     # TODO concatenate three datasets
-    #dataset2 = torchtext.data.TabularDataset(path=kaggle_cleaned_train_data, skip_header=True, format='csv', fields=fields)
+    dataset2 = torchtext.data.TabularDataset(path=kaggle_cleaned_train_data, skip_header=True, format='csv', fields=fields)
     # dataset3 = torchtext.data.TabularDataset(path=kaggle_cleaned_test_data, skip_header=True, format='csv', fields=fields)
     #full_data = torchtext.data.TabularDataset(path=merged_cleaned_test_data, skip_header=True, format='csv',
      #                                        fields=fields)
-    train_set, valid_set, test_set = split_data(dataset1)
+    train_set, valid_set, test_set = split_data(dataset2)
 
     # create vocabulary index
     word_field.build_vocab(train_set)
@@ -215,16 +215,17 @@ if __name__== "__main__":
     set_global_seed()
     train_set, valid_set, test_set = create_dataloader()
 
-    # model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
-    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
-
-    # model = FastTextBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
-    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7847264345505277, Train loss: 0.5389000631933878 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4570241004228592
+    #model = GloveBasedAttentionLSTMModel(index_to_vocab=index_to_vocab)
+    #train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.8516316874924178, Train loss: 0.39275846587698166 |Validation accuracy: 0.8214285714285714, Validation loss: 0.4745837217377078
 
     # model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
-    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 29: Train accuracy: 0.8547252213999758, Train loss: 0.380580750385265 |Validation accuracy: 0.8266747376916869, Validation loss: 0.46899683312062296
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # 0.866711
 
     # model = FastTextBasedLSTMModel(index_to_vocab=index_to_vocab)
+    # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 30: Train accuracy: 0.9196421407365802, Train loss: 0.264950641202567 |Validation accuracy: 0.8660209846650525, Validation loss: 0.3871996518104307
+    print(max_val+1)
+    #model = Char_based_RNN(max_val+1,max_val+1,3)
+    #train_model(model.cuda(), train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9)
     # train_model(model, train_set, valid_set, batch_size=32, learning_rate=0.001, num_epochs=30, momentum=0.9) # Epoch 17: Train accuracy: 0.7729588741962877, Train loss: 0.5484655738801891 |Validation accuracy: 0.8264729620661824, Validation loss: 0.45265432788479715
     #print(max_val+1)
     #model = Char_based_RNN(max_val+1,max_val+1,3)
@@ -235,12 +236,15 @@ if __name__== "__main__":
     # print(output)
     # output = model(['bitches', 'get', 'cut', 'everyday', 'b'])
     # print(output)
+    #train_model(model.cuda(), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
     model = CharBasedAttentionRNN()
-    train_model(model.to(device), train_set, valid_set, batch_size=256, learning_rate=0.001, num_epochs=30, momentum=0.9)
+    train_model(model.cuda(), train_set, valid_set, batch_size=128, learning_rate=0.001, num_epochs=30, momentum=0.9)
 
 
-    model = Char_based_RNN(33, 33, 3).to(device)
-    model.load_state_dict(torch.load('model_Char_based_RNN_bs256_lr0.001_epoch18_momentum_0.9'))
+    #model = Char_based_RNN(33, 33, 3).cuda()
+    #model.load_state_dict(torch.load('model_Char_based_RNN_bs256_lr0.001_epoch18_momentum_0.9'))
+    #model = Char_based_RNN(33, 33, 3).to(device)
+    #model.load_state_dict(torch.load('model_Char_based_RNN_bs256_lr0.001_epoch18_momentum_0.9'))
     #criterion = nn.CrossEntropyLoss()
     #err,loss = get_accuracy(model, test_set , criterion, 32)
     #print(err)
