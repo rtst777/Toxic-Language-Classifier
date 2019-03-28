@@ -14,9 +14,9 @@ class CharBasedAttentionRNN(nn.Module):
 
     def attention(self, lstm_output, final_hidden_state):
         hidden = final_hidden_state.squeeze(0)
-        attn_weights = torch.bmm(lstm_output, hidden.unsqueeze(2)).squeeze(2)
+        attn_weights = torch.bmm(lstm_output.to(self.device), hidden.unsqueeze(2).to(self.device)).squeeze(2)
         soft_attn_weights = self.softmax(attn_weights)
-        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2), soft_attn_weights.unsqueeze(2)).squeeze(2)
+        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2).to(self.device), soft_attn_weights.unsqueeze(2).to(self.device)).squeeze(2)
 
         return new_hidden_state
 
