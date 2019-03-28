@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from model.constants import FAST_TEXT_INPUT_SIZE
+from constants import FAST_TEXT_INPUT_SIZE
 import torchtext
 
 class FastTextBasedLSTMModel(nn.Module):
