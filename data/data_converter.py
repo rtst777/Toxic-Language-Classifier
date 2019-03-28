@@ -11,7 +11,7 @@ kaggle_data_cleaned_train_file_name = "cleaned_data/dataset2.csv"
 kaggle_data_raw_test_data_file_name = "kaggle/test.csv"
 kaggle_data_raw_test_label_file_name = "kaggle/test_labels.csv"
 kaggle_data_cleaned_test_file_name = "cleaned_data/dataset3.csv"
-# nltk.download()
+#nltk.download()
 stopword = nltk.corpus.stopwords.words('english')
 
 def remove_punct(text):
@@ -33,10 +33,14 @@ def remove_empty_string_token(text):
 
 def lower_case_text(text):
     text = [x.lower() for x in text]
-
     return text
+
 def clean_unicode(text):
     return [x.encode('ascii', 'ignore') for x in text]
+
+def byte_to_string(text):
+    return [x.decode('utf-8') for x in text]
+
 def convert_github_data():
     df = pd.read_csv(github_data_raw_file_name)
     subdf = df[['tweet', 'class']]
@@ -50,6 +54,7 @@ def convert_github_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
     subdf['data'] = subdf['data'].apply(lambda x: clean_unicode(x))
+    subdf['data'] = subdf['data'].apply(lambda x: byte_to_string(x))
     # save cleaned data to file
     subdf.to_csv(path_or_buf=github_data_cleaned_file_name, index=False)
     idx_list = np.random.randint(low=0, high=len(subdf) - 1, size=int(len(subdf) / div)).tolist()
@@ -117,6 +122,6 @@ if __name__== "__main__":
     global div
     div = 25
     np.random.seed(seed=420)
-    convert_github_data()
-    convert_kaggle_train_data()
+    #convert_github_data()
+    #convert_kaggle_train_data()
     convert_kaggle_test_data()
