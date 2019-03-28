@@ -7,7 +7,6 @@ import ast
 import re
 import json
 import codecs
-from model.baseline_model import ToxicBaseLSTM
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
