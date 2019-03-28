@@ -103,7 +103,7 @@ if __name__== "__main__":
     model.load_state_dict(torch.load(saved_model_path, map_location=device))
 
     accuracy, total_time_cost = evaluate(model, test_set)
-    print(("Model {}: Accuracy {}, total_time_cost {}").format(
+    print(("Model {}: Accuracy {}, total_time_cost {} seconds").format(
         model.name,
         accuracy,
         total_time_cost))
