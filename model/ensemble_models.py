@@ -29,19 +29,63 @@ import torch.nn as nn
 #       model 3 -> {class 1: 0.8, class 2: 0.1, class 3: 0.1}   weight: 0.4
 #       prediction -> {class 1: 0.8, class 2: 0.1, class 3: 0.1}
 #
+#  - mixture_of_experts:
+#       most words have embedding -> word based model
+#                                                     long sentence -> word based attention model
+#                                                     else          -> word based non-attention model
+#       else                      -> char based model
+#                                                     long sentence -> char based attention model
+#                                                     else          -> char based non-attention model
+#
 class EnsembleModels(nn.Module):
-    def __init__(self, model_and_score, policy):
+    def __init__(self, model_and_score, policy, word_based, char_based, word_attention_based, char_attention_based):
         super(EnsembleModels, self).__init__()
         self.name = 'EnsembleModels'
         self.model_and_score = model_and_score
         self.policy = policy
+        self.word_based = word_based
+        self.char_based = char_based
+        self.word_attention_based = word_attention_based
+        self.char_attention_based = char_attention_based
 
     def highest_weights(self, x, model_and_score, weights):
         idx = torch.argmax(weights)
         chosen_model = model_and_score[idx][0]
         return chosen_model(x)
 
+    def mixture_of_experts(self, x):
+        word_num_threshold = 20
+        word_embedding_ratio = 0.9
+
+        num_word_embedding = 0
+        for token in x:
+            if self.word_based.canProcess(token):
+                num_word_embedding += 1
+
+        chosen_model = None
+        total_num_words = len(x)
+        if num_word_embedding > total_num_words * word_embedding_ratio:
+            if total_num_words > word_num_threshold:
+                print("word_attention_based is used")
+                chosen_model = self.word_attention_based
+            else:
+                print("word_attention is used")
+                chosen_model = self.word_based
+        else:
+            if total_num_words > word_num_threshold:
+                print("char_attention_based is used")
+                chosen_model = self.char_attention_based
+            else:
+                print("char_based is used")
+                chosen_model = self.char_based
+
+        return chosen_model(x)
+
     def forward(self, x):
+        if (self.policy == "mixture_of_experts"):
+            out = self.mixture_of_experts(x)
+            return out
+
         # compute weights
         weights = torch.zeros(len(self.model_and_score))
         sum = 0
