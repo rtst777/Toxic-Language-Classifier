@@ -19,7 +19,8 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 from model.train_model import set_global_seed, get_model_name, tokenizer
 import time
-IS_CHAR = True
+IS_CHAR = False
+index_to_vocab = None
 
 def create_test_set():
     word_num_threshold = 30
@@ -46,6 +47,8 @@ def create_test_set():
 
     test_dataset = torchtext.data.TabularDataset(path=kaggle_cleaned_test_data, skip_header=True, format='csv', fields=fields)
     word_field.build_vocab(test_dataset)
+    global index_to_vocab
+    index_to_vocab = word_field.vocab.itos
 
     test_set, _ = test_dataset.split([0.01, 0.99], random_state=random.getstate())
     test_set, long_test_set, short_test_set = test_set.split([0.4, 0.3, 0.3], random_state=random.getstate())
@@ -84,6 +87,9 @@ def evaluate(model, test_set, batch_size = 1):
     total_time_cost = 0
     for i, batch in enumerate(test_iter):
         input_data = batch.data[0]
+        if input_data.shape[1] == 0:
+            continue
+
         start_time = time.time()
         output = model(input_data)  # Check this input data format
         end_time = time.time()
@@ -94,7 +100,7 @@ def evaluate(model, test_set, batch_size = 1):
         correct += pred.eq(labels.view_as(pred)).sum().item()
         total += labels.shape[0]
 
-    return correct / total, total_time_cost / len(test_iter)
+    return correct / total, total_time_cost / total
 
 
 def measure_model_performance(model, test_set, long_sentence_test_set, short_test_set):
@@ -121,14 +127,21 @@ if __name__== "__main__":
 
     # create models
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    char_model = Char_based_RNN()
-    saved_char_model_path = get_model_name(char_model.name, 256, 0.001, 18, 0.9)
-    char_model.load_state_dict(torch.load(saved_char_model_path, map_location=device))
+    # char_model = Char_based_RNN()
+    # saved_char_model_path = get_model_name(char_model.name, 256, 0.001, 18, 0.9)
+    # char_model.load_state_dict(torch.load(saved_char_model_path, map_location=device))
+    #
+    # char_attention_model = CharBasedAttentionRNN()
+    # saved_char_attention_model_path = get_model_name(char_attention_model.name, 256, 0.001, 4, 0.9)
+    # char_attention_model.load_state_dict(torch.load(saved_char_attention_model_path, map_location=device))
 
-    char_attention_model = CharBasedAttentionRNN()
-    saved_char_attention_model_path = get_model_name(char_attention_model.name, 256, 0.001, 4, 0.9)
-    char_attention_model.load_state_dict(torch.load(saved_char_attention_model_path, map_location=device))
+    word_based_model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
+    saved_word_based_model_path = get_model_name(word_based_model.name, 32, 0.001, 11, 0.9)
+    word_based_model.load_state_dict(torch.load(saved_word_based_model_path, map_location=device))
+
+
 
     # measure model performance
-    measure_model_performance(char_model, test_set, long_sentence_test_set, short_test_set)
-    measure_model_performance(char_attention_model, test_set, long_sentence_test_set, short_test_set)
+    # measure_model_performance(char_model, test_set, long_sentence_test_set, short_test_set)
+    # measure_model_performance(char_attention_model, test_set, long_sentence_test_set, short_test_set)
+    measure_model_performance(word_based_model, test_set, long_sentence_test_set, short_test_set)
