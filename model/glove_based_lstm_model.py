@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from constants import GLOVE_INPUT_SIZE
+from model.constants import GLOVE_INPUT_SIZE
 import torchtext
 
 class GloveBasedLSTMModel(nn.Module):
@@ -10,8 +10,8 @@ class GloveBasedLSTMModel(nn.Module):
         self.glove = torchtext.vocab.GloVe(name="6B", dim=GLOVE_INPUT_SIZE)  # TODO tune number
         self.hidden_size = hidden_size
         self.name = 'GloveBasedLstmModel'
-        self.rnn = nn.LSTM(input_size, hidden_size, batch_first=True, bidirectional=True)
-        self.fc = nn.Linear(hidden_size * 2, num_classes)
+        self.rnn = nn.LSTM(input_size, hidden_size, batch_first=True)
+        self.fc = nn.Linear(hidden_size, num_classes)
 
     def convert_input_to_glove(self, x):
         if isinstance(x, list):
@@ -29,8 +29,8 @@ class GloveBasedLSTMModel(nn.Module):
     def forward(self, x):
         x = self.convert_input_to_glove(x)
         # Need to call the function "convert_word_to_glove"
-        h0 = torch.zeros(2, x.size(0), self.hidden_size)
-        c0 = torch.zeros(2, x.size(0), self.hidden_size)
+        h0 = torch.zeros(1, x.size(0), self.hidden_size)
+        c0 = torch.zeros(1, x.size(0), self.hidden_size)
         # Forward propagate the LSTM
         out, _ = self.rnn(x, (h0, c0))
         out = self.fc(out[:, -1, :])
