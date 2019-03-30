@@ -7,8 +7,8 @@ class Char_based_RNN(nn.Module):
         super(Char_based_RNN, self).__init__()
         self.name = "Char_based_RNN"
         self.hidden_size = hidden_size
-        self.rnn = nn.LSTM(input_size, hidden_size, batch_first=True)
-        self.fc1 = nn.Linear(hidden_size, 17)
+        self.rnn = nn.LSTM(input_size, hidden_size, bidirectional=True, batch_first=True)
+        self.fc1 = nn.Linear(hidden_size * 2, 17)
         self.fc2 = nn.Linear(17, 9)
         self.fc3 = nn.Linear(9, num_classes)
         self.device = device
@@ -27,10 +27,10 @@ class Char_based_RNN(nn.Module):
                     except:
                         value.append(0)
             input = torch.unsqueeze(torch.tensor(self.data_to_one_hot(value)),0)
-            h0 = (torch.zeros(1, 1, self.hidden_size).to(self.device),torch.zeros(1, 1, self.hidden_size).to(self.device))
+            h0 = (torch.zeros(2, 1, self.hidden_size).to(self.device),torch.zeros(2, 1, self.hidden_size).to(self.device))
         else:
             input = self.data_to_one_hot(x)
-            h0 = (torch.zeros(1, input.size(0), self.hidden_size).to(self.device),torch.zeros(1, input.size(0), self.hidden_size).to(self.device))
+            h0 = (torch.zeros(2, input.size(0), self.hidden_size).to(self.device),torch.zeros(2, input.size(0), self.hidden_size).to(self.device))
         # Forward propagate the RNN
         out, _ = self.rnn(input.to(self.device), h0)
         # Pass the output of the last time step to the classifier
