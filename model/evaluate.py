@@ -10,6 +10,7 @@ import codecs
 from model.fasttext_based_lstm_model import FastTextBasedLSTMModel
 from model.glove_based_lstm_model import GloveBasedLSTMModel
 from model.glove_based_attention_lstm import GloveBasedAttentionLSTMModel
+from model.glove_based_bidirection_lstm import GloveBasedBidirectionalLSTMModel
 from model.fasttext_based_attention_lstm import FastTextBasedAttentionLSTMModel
 from model.char_based_attention_model import CharBasedAttentionRNN
 from model.char_based_model import Char_based_RNN
@@ -50,7 +51,7 @@ def create_test_set():
     global index_to_vocab
     index_to_vocab = word_field.vocab.itos
 
-    test_set, _ = test_dataset.split([0.01, 0.99], random_state=random.getstate())
+    _, test_set = test_dataset.split([0.99, 0.01], random_state=random.getstate())
     test_set, long_test_set, short_test_set = test_set.split([0.4, 0.3, 0.3], random_state=random.getstate())
 
     prepare_long_sentence_test_set(long_test_set, word_num_threshold)
@@ -135,7 +136,7 @@ if __name__== "__main__":
     # saved_char_attention_model_path = get_model_name(char_attention_model.name, 256, 0.001, 4, 0.9)
     # char_attention_model.load_state_dict(torch.load(saved_char_attention_model_path, map_location=device))
 
-    word_based_model = GloveBasedLSTMModel(index_to_vocab=index_to_vocab)
+    word_based_model = GloveBasedBidirectionalLSTMModel(index_to_vocab=index_to_vocab)
     saved_word_based_model_path = get_model_name(word_based_model.name, 32, 0.001, 11, 0.9)
     word_based_model.load_state_dict(torch.load(saved_word_based_model_path, map_location=device))
 

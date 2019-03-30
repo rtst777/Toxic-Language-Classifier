@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from constants import GLOVE_INPUT_SIZE
+from model.constants import GLOVE_INPUT_SIZE
 import torchtext
 
 class GloveBasedLSTMModel(nn.Module):
