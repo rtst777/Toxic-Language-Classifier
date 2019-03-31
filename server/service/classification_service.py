@@ -26,46 +26,51 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-def getModel():
-    # model = GloveBasedLSTMModel()
-    # model = FastTextBasedLSTMModel()
-    # model = Char_based_RNN()
-    # model = GloveBasedAttentionLSTMModel()
-    # model = FastTextBasedAttentionLSTMModel()
-    model = GloveBasedBidirectionalLSTMModel()
-    saved_model_path = get_model_name(model.name, 32, 0.001, 11, 0.9)
-    # saved_model_path = get_model_name(model.name, 256, 0.001, 18, 0.9)
-    # saved_model_path = get_model_name(model.name, 32, 0.001, 29, 0.9)
-    # saved_model_path = get_model_name(model.name, 32, 0.001, 11, 0.9)
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model.load_state_dict(torch.load(saved_model_path, map_location=device))
-    return model
-
 # def getModel():
+#     # model = GloveBasedLSTMModel()
+#     # model = FastTextBasedLSTMModel()
+#     # model = Char_based_RNN()
+#     # model = GloveBasedAttentionLSTMModel()
+#     # model = FastTextBasedAttentionLSTMModel()
+#     # model = GloveBasedBidirectionalLSTMModel()
+#     # saved_model_path = get_model_name(model.name, 32, 0.001, 11, 0.9)
+#
+#     model = Char_based_RNN()
+
+#     # saved_model_path = get_model_name(model.name, 256, 0.001, 18, 0.9)
+#     # saved_model_path = get_model_name(model.name, 32, 0.001, 29, 0.9)
+#     # saved_model_path = get_model_name(model.name, 32, 0.001, 11, 0.9)
 #     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-#
-#     word_based_attention_model = GloveBasedAttentionLSTMModel()
-#     saved_word_attention_model_path = get_model_name(word_based_attention_model.name, 32, 0.001, 29, 0.9)
-#     word_based_attention_model.load_state_dict(torch.load(saved_word_attention_model_path))
-#
-#     word_based_model = GloveBasedLSTMModel()
-#     saved_word_model_path = get_model_name(word_based_model.name, 32, 0.001, 29, 0.9)
-#     word_based_model.load_state_dict(torch.load(saved_word_model_path))
-#
-#     char_based = Char_based_RNN()
-#     saved_char_model_path = get_model_name(char_based.name, 256, 0.001, 18, 0.9)
-#     char_based.load_state_dict(torch.load(saved_char_model_path, map_location='cpu'))
-#
-#     char_attention_model = CharBasedAttentionRNN()
-#     saved_char_attention_model_path = get_model_name(char_attention_model.name, 256, 0.001, 4, 0.9)
-#     char_attention_model.load_state_dict(torch.load(saved_char_attention_model_path, map_location=device))
-#
-#     policy = "mixture_of_experts"
-#     return EnsembleModels(model_and_score=None, policy=policy,
-#                           word_based=word_based_model,
-#                           char_based=char_based,
-#                           word_attention_based=word_based_attention_model,
-#                           char_attention_based=char_attention_model)
+#     saved_char_model_path = get_model_name(model.name, 64, 0.001, 27, 0.9)
+#     model.load_state_dict(torch.load(saved_char_model_path, map_location=device))
+#     # model.load_state_dict(torch.load(saved_model_path, map_location=device))
+#     return model
+
+def getModel():
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    word_based_attention_model = GloveBasedAttentionLSTMModel()
+    saved_word_attention_model_path = get_model_name(word_based_attention_model.name, 32, 0.001, 10, 0.9)
+    word_based_attention_model.load_state_dict(torch.load(saved_word_attention_model_path, map_location=device))
+
+    word_based_model = GloveBasedBidirectionalLSTMModel()
+    saved_word_model_path = get_model_name(word_based_model.name, 32, 0.001, 11, 0.9)
+    word_based_model.load_state_dict(torch.load(saved_word_model_path, map_location=device))
+
+    char_based = Char_based_RNN()
+    saved_char_model_path = get_model_name(char_based.name, 64, 0.001, 27, 0.9)
+    char_based.load_state_dict(torch.load(saved_char_model_path, map_location=device))
+
+    char_attention_model = CharBasedAttentionRNN()
+    saved_char_attention_model_path = get_model_name(char_attention_model.name, 64, 0.001, 15, 0.9)
+    char_attention_model.load_state_dict(torch.load(saved_char_attention_model_path, map_location=device))
+
+    policy = "mixture_of_experts"
+    return EnsembleModels(model_and_score=None, policy=policy,
+                          word_based=word_based_model,
+                          char_based=char_based,
+                          word_attention_based=word_based_attention_model,
+                          char_attention_based=char_attention_model)
 
 
 # def getModel():

@@ -54,11 +54,14 @@ class EnsembleModels(nn.Module):
         return chosen_model(x)
 
     def mixture_of_experts(self, x):
-        word_num_threshold = 20
+        word_num_threshold = 10
+        char_num_threshold = 50
         word_embedding_ratio = 0.9
 
         num_word_embedding = 0
+        num_char = 0
         for token in x:
+            num_char += len(token)
             if self.word_based.canProcess(token):
                 num_word_embedding += 1
 
@@ -66,17 +69,17 @@ class EnsembleModels(nn.Module):
         total_num_words = len(x)
         if num_word_embedding > total_num_words * word_embedding_ratio:
             if total_num_words > word_num_threshold:
-                print("word_attention_based is used")
+                print("word_attention based is used")
                 chosen_model = self.word_attention_based
             else:
-                print("word_attention is used")
+                print("word based is used")
                 chosen_model = self.word_based
         else:
-            if total_num_words > word_num_threshold:
-                print("char_attention_based is used")
+            if num_char > char_num_threshold:
+                print("char_attention based is used")
                 chosen_model = self.char_attention_based
             else:
-                print("char_based is used")
+                print("char based is used")
                 chosen_model = self.char_based
 
         return chosen_model(x)
