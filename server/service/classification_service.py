@@ -97,9 +97,9 @@ def getModel():
 def preprocess_input(rawinput):
     rawinput = remove_punct(rawinput)
     rawinput = tokenization(rawinput)
+    rawinput = lower_case_text(rawinput)
     rawinput = remove_stopwords(rawinput)
-    rawinput = remove_empty_string_token(rawinput)
-    clean_input = lower_case_text(rawinput)
+    clean_input = remove_empty_string_token(rawinput)
     return clean_input
 
 label = ["hate", "offensive", "neither"]
