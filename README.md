@@ -22,7 +22,7 @@ Pytorch(>=1.0.0)
 ## Tests
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](https://www.youtube.com/watch?v=FWtbGkpdoP4&list=RDwUOblijJbx4&index=5) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/LICENSE) file for details
 
 ## Acknowledgement
 
