@@ -83,6 +83,7 @@ def convert_kaggle_train_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
     subdf['data'] = subdf['data'].apply(lambda x: clean_unicode(x))
+    subdf['data'] = subdf['data'].apply(lambda x: byte_to_string(x))
     idx_list = np.random.randint(low=0, high=len(subdf)-1, size=int(len(subdf)/div)).tolist()
     newdf = subdf.iloc[idx_list,:]
     newdf.to_csv(path_or_buf="cleaned_data/dataset4.csv", index=False)
@@ -109,6 +110,7 @@ def convert_kaggle_test_data():
     subdf['data'] = subdf['data'].apply(lambda x: remove_empty_string_token(x))
     subdf['data'] = subdf['data'].apply(lambda x: lower_case_text(x))
     subdf['data'] = subdf['data'].apply(lambda x: clean_unicode(x))
+    subdf['data'] = subdf['data'].apply(lambda x: byte_to_string(x))
     idx_list = np.random.randint(low=0, high=len(subdf)-1, size=int(len(subdf)/div)).tolist()
     newdf = subdf.iloc[idx_list,:]
     newdf.to_csv(path_or_buf="cleaned_data/dataset4.csv", index=False)
@@ -123,5 +125,5 @@ if __name__== "__main__":
     div = 25
     np.random.seed(seed=420)
     #convert_github_data()
-    #convert_kaggle_train_data()
-    convert_kaggle_test_data()
+    convert_kaggle_train_data()
+    #convert_kaggle_test_data()
