@@ -12,7 +12,7 @@ The project is one ensemble of models (RNNs) that classifies the input text mess
 
 ## User Interface
 
-![example1](https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image4.png){:height="50%" width="50%"}
+<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image4.png" width="100" height="100">
 ![example2](https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image16.png)
 ![example3](https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image17.png)
 ![example4](https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image9.png)
