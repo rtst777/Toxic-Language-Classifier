@@ -9,3 +9,9 @@ The project is one ensemble of models (RNNs) that classifies the input text mess
 **Attention Based Word/Char Models**: after the last LSTM state is computed, going back and loop through all the previous LSTM states when making the prediction, which is so-called attention.
 
 **Ensemble**: We designed a customized ensemble strategy when building the overall software structure. First, check if most of words have glove embedding. If so, we use word-based model. Otherwise, we use character-based model. Then we check if it is a long sentence. If so, we replace the model with the attention-based model. Otherwise, we don’t use attention to save the prediction time.
+
+## Prerequisite
+`
+Python(>=3.6.0)
+Pytorch(>=1.0.0)
+`
