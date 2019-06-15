@@ -15,3 +15,11 @@ The project is one ensemble of models (RNNs) that classifies the input text mess
 Python(>=3.6.0)  
 Pytorch(>=1.0.0)
 `
+## Installing
+
+## Authors
+
+## Tests
+
+## Acknowledgement
+
