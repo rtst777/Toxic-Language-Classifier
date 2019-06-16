@@ -18,7 +18,10 @@ The project is an ensemble of models that classifies the input text messages as 
 * Tracks long term dependency.
 <img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image7.png" width="400" height="260">
 
-**Ensemble**: We designed a customized ensemble strategy when building the overall software structure. First, check if most of words have glove embedding. If so, we use word-based model. Otherwise, we use character-based model. Then we check if it is a long sentence. If so, we replace the model with the attention-based model. Otherwise, we don’t use attention to save the prediction time.
+**Ensemble**:
+
+
+We designed a customized ensemble strategy when building the overall software structure. First, check if most of words have glove embedding. If so, we use word-based model. Otherwise, we use character-based model. Then we check if it is a long sentence. If so, we replace the model with the attention-based model. Otherwise, we don’t use attention to save the prediction time.
 
 <img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image14.png" width="630" height="400">
 
@@ -35,8 +38,6 @@ The classifier is served from the web server with friendly user interface.
 Python(>=3.6.0)  
 Pytorch(>=1.0.0)
 `
-## Installing
-
 
 ## Authors
 Yizhan Jiang (yizhan.jiang@mail.utoronto.ca) <br>
