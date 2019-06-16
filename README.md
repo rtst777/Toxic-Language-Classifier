@@ -1,27 +1,26 @@
 # Toxic-Language-Classifier
 ## Description
-### Overview
 The project is an ensemble of models that classifies the input text messages as hate speech, offensive language or neither. The models are trained on the datasets collected from [comments in Wikipedia](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data) and [tweets](https://github.com/t-davidson/hate-speech-and-offensive-language/tree/master/data). The project could be applied on the public platform, for the purpose of automatic classification of toxic comments, and provide one fruitful and friendly discussion environment.
 
-### Model Types
+## Model Types
 **Word Based LSTM**: 
 * Bidirectional LSTM with glove embedding. 
 * Provides distributed word representation. 
-<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image8.png" width="400" height="330">
+<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image8.png" width="440" height="330">
 
 **Character Based LSTM**:  
 * Bidirectional LSTM with character encoding. 
 * Handles typo or creative words.
-<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image2.png" width="400" height="300">
+<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image2.png" width="400" height="290">
 
 **Attention Based Word/Char Models**: 
 * Attention based LSTM with glov embedding or character encoding. 
 * Tracks long term dependency.
-<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image7.png" width="400" height="300">
+<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image7.png" width="400" height="260">
 
 **Ensemble**: We designed a customized ensemble strategy when building the overall software structure. First, check if most of words have glove embedding. If so, we use word-based model. Otherwise, we use character-based model. Then we check if it is a long sentence. If so, we replace the model with the attention-based model. Otherwise, we don’t use attention to save the prediction time.
 
-<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image14.png" width="650" height="400">
+<img src = "https://github.com/rtst777/Toxic-Language-Classifier/blob/develop/images/image14.png" width="630" height="400">
 
 
 ## User Interface
