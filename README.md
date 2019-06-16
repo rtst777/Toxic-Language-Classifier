@@ -35,7 +35,10 @@ The classifier is served from the web server with friendly user interface.
 
 ## Prerequisite
 `
-Python(>=3.6.0)  
+Python(>=3.6.0) 
+`
+<br>
+`
 Pytorch(>=1.0.0)
 `
 
