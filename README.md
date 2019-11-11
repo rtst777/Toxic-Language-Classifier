@@ -1,6 +1,6 @@
 # Toxic-Language-Classifier
 ## Description
-The project is an ensemble of models that classifies the input text messages as hate speech, offensive language or neither. The models are trained on the datasets collected from [comments in Wikipedia](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data) and [tweets](https://github.com/t-davidson/hate-speech-and-offensive-language/tree/master/data). The project could be applied on the public platform, for the purpose of automatic classification of toxic comments, and provide one fruitful and friendly discussion environment.
+The project is an ensemble of models that classifies the input text messages as hate speech, offensive language or neither. The models are trained on the datasets collected from [comments in Wikipedia](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/data) and [tweets](https://github.com/t-davidson/hate-speech-and-offensive-language/tree/master/data). The average test accuracy is above 90%. The project could be applied on the public platform, for the purpose of automatic classification of toxic comments, and provide one fruitful and friendly discussion environment.
 
 ## Model Types
 **Word Based LSTM**: 
